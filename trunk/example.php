@@ -6,25 +6,25 @@
 		.myclass { color: red; text-align: center; }
 	</style>
 
-	<script type="text/javascript" src="js/prototype/prototype.js"></script>
-	<script type="text/javascript" src="js/raphael/raphael-min.js"></script>
+	<script type="text/javascript" src="source/prototype/prototype.js"></script>
+	<script type="text/javascript" src="source/raphael/raphael-min.js"></script>
 	<?php if (isset ($_REQUEST["action"]) && $_REQUEST["action"] == "test"): ?>
-	<script type="text/javascript" src="release/technet.js"></script>
+	<script type="text/javascript" src="source/technet/technet-min.js"></script>
 	<?php else: ?>
-	<script type="text/javascript" src="js/technet_core.js"></script>
-	<script type="text/javascript" src="js/technet_config.js"></script>
-	<script type="text/javascript" src="js/technet_helpers.js"></script>
-	<script type="text/javascript" src="js/technet_helper_md5.js"></script>
-	<script type="text/javascript" src="js/technet_container.js"></script>
-	<script type="text/javascript" src="js/technet_events.js"></script>
-	<script type="text/javascript" src="js/technet_interpreter.js"></script>
-	<script type="text/javascript" src="js/technet_interpreter2.js"></script>
-	<script type="text/javascript" src="js/technet_template.js"></script>
-	<script type="text/javascript" src="js/technet_controller.js"></script>
-	<script type="text/javascript" src="js/technet_model.js"></script>
-	<script type="text/javascript" src="js/technet_view.js"></script>
-	<script type="text/javascript" src="js/technet_process.js"></script>
-	<script type="text/javascript" src="js/technet_client.js"></script>
+	<script type="text/javascript" src="source/technet/technet_core.js"></script>
+	<script type="text/javascript" src="source/technet/technet_config.js"></script>
+	<script type="text/javascript" src="source/technet/technet_helpers.js"></script>
+	<script type="text/javascript" src="source/technet/technet_helper_md5.js"></script>
+	<script type="text/javascript" src="source/technet/technet_container.js"></script>
+	<script type="text/javascript" src="source/technet/technet_events.js"></script>
+	<script type="text/javascript" src="source/technet/technet_interpreter.js"></script>
+	<script type="text/javascript" src="source/technet/technet_interpreter2.js"></script>
+	<script type="text/javascript" src="source/technet/technet_template.js"></script>
+	<script type="text/javascript" src="source/technet/technet_controller.js"></script>
+	<script type="text/javascript" src="source/technet/technet_model.js"></script>
+	<script type="text/javascript" src="source/technet/technet_view.js"></script>
+	<script type="text/javascript" src="source/technet/technet_process.js"></script>
+	<script type="text/javascript" src="source/technet/technet_client.js"></script>
 	<?php endif; ?>
 	<script type="text/javascript" src="../technet_server/settings.php?action=client_config"></script>
 	<script type="text/javascript">
