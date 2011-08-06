@@ -93,6 +93,19 @@ Core = new (Class.create ( /** @lends Core# */ {
 			if (Object.isString (parent))
 				parent = _objects[parent];
 
+			//If a base class constructor calls an oninit() function, combine
+			//it with the oninit() of the new class.
+			if (typeof (parent) != "undefined" && 
+				typeof (parent.prototype) != "undefined" &&
+				typeof (parent.prototype.oninit) == "function") {
+				if (typeof (methods.oninit) != "undefined") {
+					methods.oninit = new Multicast (
+						parent.prototype.oninit, 
+						method.init
+					);
+				}
+			}
+
 			object = Class.create (parent, methods);
 
 			if (statics) Object.extend (object, statics);

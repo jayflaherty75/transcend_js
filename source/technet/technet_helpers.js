@@ -207,6 +207,10 @@ Core._("Helpers").register ("Type", new (Class.create ({
 			return typeof object != "undefined";
 		};
 
+		this.is = function (type, object) {
+			return this.getType (object) == type;
+		};
+
 		this.toArray = function (object) {
 			if (!object) return [];
 			if ('toArray' in Object(object)) return object.toArray();

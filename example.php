@@ -30,6 +30,24 @@
 	<script type="text/javascript">
 		// <![CDATA[
 		window.onload = function () {
+			Core.extend ("Template2", "Interpreter2", {
+				oninit: function (context) {
+					if (Object.isUndefined (context)) {
+						context = Core._("DOMContext");
+					}
+				},
+
+				apply: function (chunk, target) {
+					var context = this.context ();
+					var result = this.run (chunk);
+
+					if (target && Object.isFunction (context.onapply)) 
+						context.onapply.bind (this) (target, result);
+
+					return result;
+				}
+			});
+
 			/*
 			Core.register ("ContextAbstract", (function () {
 				var _type = Core._("Helpers.Type");
@@ -340,62 +358,6 @@
 					};
 
 					if (Interpreter2.test () === false) alert ("fail!");
-					/*
-					//Interpreter v2 test code
-					var context = new Context2 ();
-					var interpreter = new Interpreter2 (context);
-					//var hw = ModelProxy ("Array");
-					//var mdl_arr = new ArrayModel ();
-					//var hw = mdl_arr.getInstance (
-					var hw = [
-						{ action: "foreach", data: "message", _nodes: [
-							{ action: "print" },
-							{ action: "print", text: "..." }
-						]}
-					];
-					var _output = "";
-
-					context.register ("foreach", function (params, nodes) {
-						var name = params["data"];
-						var data = Model.modelize (this.get (name));
-						var iterator = data.getIterator ();
-						var interpreter = this.spawn ();
-						var element = iterator.first ();
-						var state = interpreter.get ("_state");
-						var result = true;
-
-						while (!iterator.isEnd () && result) {
-							state["d"] = element;
-							result = interpreter.run (nodes);
-							element = iterator.next ();
-						};
-
-						return result;
-					});
-
-					context.register ("print", function (params) {
-						var text = params["text"] || this.get ("_state")["d"];
-
-						if (text != "_World") {
-							_output += text;
-							return true;
-						}
-
-						this.get ("_state").e.message = "Invalid input";
-
-						return false;
-					});
-
-					interpreter.assign ("message", ["Hello", "_World"]);
-
-					if (!interpreter.run (hw)) {
-						_output += "Error: ";
-						_output += interpreter.get ("_state").e.message + " ";
-						_output += $A(interpreter.get ("_state").e.trace).inspect ();
-					}
-
-					console.log (_output);
-					*/
 				}
 			});
 

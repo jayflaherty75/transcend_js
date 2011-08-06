@@ -1149,6 +1149,135 @@ Core.extend ("ObjectModel", "ModelAbstract", /** @lends HashModel */ {
 });
 
 //-----------------------------------------------------------------------------
+Core.extend ("ElementIterator", "IteratorAbstract", /** @lends ElementIterator */ (function () {
+	var _class_name = "Array";
+
+	/**
+	 * @class Generic iterator for operating on child nodes of DOM Elements.
+	 * @extends IteratorAbstract
+	 * @constructs
+	 */
+	var oninit = function () {
+		var _index = 0;
+		var _data = this.data().childNodes;
+		var class_name = "Element";
+
+		this.className (_class_name);
+
+		this.onfirst = function () {
+			_index = 0;
+			return _data[_index];
+		};
+
+		this.onnext = function () {
+			_index++;
+			return _data[_index];
+		};
+
+		this.onref = function () {
+			return _index;
+		};
+
+		this.onindex = function (index) {
+			_index = index;
+			return _data[_index];
+		};
+
+		this.onend = function () {
+			if (_index >= _data.length)
+				return true;
+			else
+				return false;
+		};
+	};
+
+	return {
+		oninit: oninit
+	};
+}) ());
+
+//-----------------------------------------------------------------------------
+Core.extend ("ElementModel", "ModelAbstract", /** @lends ElementModel */ {
+	/**
+	 * @class Simple model for handling basic DOM Elements
+	 * @extends ModelAbstract
+	 * @constructs
+	 */
+	oninit: function () {
+		this.className ("Element");
+		this.defaultIterator (ElementIterator);
+	},
+
+	oncreate: function () {
+		var _type = Core._("Helpers.Type");
+		var args = $A(arguments);
+		var object;
+
+		switch (_type.getType (args[0])) {
+		case "Element":
+			object = args[0];
+			break;
+		case "String":
+			object = document.createElement (args[0]);
+			break;
+		default:
+			object = document.createElement ("div");
+		}
+
+		return object;
+	},
+
+	filterReference: function (ref) {
+		if (typeof (ref) != "number")
+			ref = 0;
+
+		return ref;
+	},
+
+	getFirstRef: function () {
+		return 0;
+	},
+
+	getLastRef: function () {
+		return this.childNodes.length - 1;
+	},
+
+	onset: function (ref, value) {
+		this.replaceChild (value, this.childNodes[ref]);
+	},
+
+	onget: function (ref) {
+		return this.childNodes[ref];
+	},
+
+	onunset: function (ref) {
+		var value = this.childNodes[ref];
+		if (typeof (value) != "undefined") this.childNodes.splice (ref, 1);
+		return value;
+	},
+
+	oninsert: function (ref, value) {
+		var nodes = this.childNodes;
+
+		if (ref < 0)
+			ref = 0;
+		else if (ref >= nodes.length)
+			ref = nodes.length;
+
+		nodes.splice (ref, 0, value);
+	},
+
+	oncompare: function (ref, value) {
+		var element = this.get (ref);
+
+		if (element == value) 
+			return 0;
+		else
+			return -1;
+	}
+});
+
+//-----------------------------------------------------------------------------
 Core.extend ("ImageModel", "ModelAbstract", /** @lends ImageModel */ {
 	/**
 	 * @class Simple model for seemlessly integrating DOM Images
