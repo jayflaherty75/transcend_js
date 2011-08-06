@@ -27,6 +27,7 @@ Core.register ("Multicast",  /** @lends Multicast# */ {
 	initialize: function () {
 		var pvt = {
 			listeners: new Array (),
+			binding: false,
 			self: this
 		};
 
@@ -140,6 +141,21 @@ Core.register ("Multicast",  /** @lends Multicast# */ {
 
 		//--------------------------------------------------------------------
 		/**
+		 * Binds an object to all calls in Multicast.
+		 * @name Multicast#bind
+		 * @function
+		 * @param {object} Object to bind to all function calls in Multicast
+		 * @return Returns the Multicast object, allowing for call chains
+		 * @type Multicast
+		 */
+		this.bind = function (object) {
+			pvt.binding = object;
+
+			return this;
+		};
+
+		//--------------------------------------------------------------------
+		/**
 		 * Calls all contained functions.  Any parameters passed are propagated
 		 * to all functions.
 		 * @name Multicast#call
@@ -168,7 +184,13 @@ Core.register ("Multicast",  /** @lends Multicast# */ {
 			for (var i = 0; i < pvt.listeners.length; i++) {
 				args = $A(arguments);
 				if (typeof (result) != "undefined") args.push (result);
-				result = pvt.listeners[i].apply (this, args);
+
+				if (pvt.binding === false) {
+					result = pvt.listeners[i].apply (this, args);
+				}
+				else {
+					result = pvt.listeners[i].apply (pvt.binding, args);
+				}
 			}
 
 			return result;
