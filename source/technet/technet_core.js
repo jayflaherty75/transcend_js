@@ -95,14 +95,16 @@ Core = new (Class.create ( /** @lends Core# */ {
 
 			//If a base class constructor calls an oninit() function, combine
 			//it with the oninit() of the new class.
-			if (typeof (parent) != "undefined" && 
-				typeof (parent.prototype) != "undefined" &&
-				typeof (parent.prototype.oninit) == "function") {
-				if (typeof (methods.oninit) != "undefined") {
-					methods.oninit = new Multicast (
+			if (typeof (methods.oninit) != "undefined") {
+				if (typeof (parent) != "undefined" && 
+					typeof (parent.prototype) != "undefined" &&
+					typeof (parent.prototype.oninit) == "function") {
+					var mcast = Core._("Multicast",
 						parent.prototype.oninit, 
-						method.init
+						methods.oninit
 					);
+
+					if (mcast) methods.oninit = mcast;
 				}
 			}
 

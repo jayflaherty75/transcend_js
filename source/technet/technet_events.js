@@ -45,7 +45,7 @@ Core.register ("Multicast",  /** @lends Multicast# */ {
 		 * @name Multicast#resultMethod
 		 * @type Property (string)
 		 */
-		this.resultMethod = new Property ("chain");
+		this.resultMethod = new Core._ ("Property", "chain");
 		this.resultMethod.onchange = function (value) {
 			return (value | "chain").toString ().toLowerCase ();
 		};

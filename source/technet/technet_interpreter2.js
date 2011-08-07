@@ -33,7 +33,7 @@ Core.register ("Context2", /** @lends Context2 */ (function () {
 
 			if (_type.isUndefined (state)) {
 				state = {
-					a: 0,							//Accumulator
+					a: 0,					//Accumulator
 					e: {
 						message: false,		//Error message
 						trace: new Array ()	//Stack trace
@@ -279,22 +279,33 @@ Core.extend ("Interpreter2", "Container", /** @lends Interpreter2 */ (function (
 	var run = function (data) {
 		var context = this.context ();
 		var state = this.get ("_state");
-		var iterator, command, result;
+		var iterator, command, result = true;
 
 		if (_type.isDefined (data)) {
-			data = Model.modelize (data);
-			iterator = data.getIterator ();
+			if (_type.isFunction (this.onstart))
+				result = this.onstart (data);
 
-			this.iterator = iterator;
-			this.symbol = iterator.first ();
+			if (result) {
+				data = Model.modelize (data);
+				iterator = data.getIterator ();
 
-			do {
-				this.resetState ();
-				this.handler (Object.clone (this.symbol));
-				command = this.getState ();
-				result = context.execute (command.id, command.parameters, command.nodes);
-				this.symbol = this.iterator.next ();
-			} while (!this.iterator.isEnd() && result);
+				this.iterator = iterator;
+				this.symbol = iterator.first ();
+
+				do {
+					this.resetState ();
+					this.handler (Object.clone (this.symbol));
+					command = this.getState ();
+					result = context.execute (command.id, command.parameters, command.nodes);
+					if (_type.isFunction (this.onresult))
+						result = this.onresult (command, result);
+
+					this.symbol = this.iterator.next ();
+				} while (!this.iterator.isEnd() && result);
+			}
+
+			if (_type.isFunction (this.oncomplete))
+				result = this.oncomplete (data);
 
 			return result;
 		}
