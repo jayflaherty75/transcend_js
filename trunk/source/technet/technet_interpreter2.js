@@ -49,6 +49,18 @@ Core.register ("Context2", /** @lends Context2 */ (function () {
 		return oldval;
 	};
 
+	var _onstart = function (code) {
+		return true;
+	};
+
+	var _onresult = function (command, result) {
+		return true;
+	};
+
+	var _oncomplete = function (result) {
+		return true;
+	};
+
 	//--------------------------------------------------------------------------
 	/**
 	 * Initializes collections of rules, iterator mappings and interpreter
@@ -81,9 +93,10 @@ Core.register ("Context2", /** @lends Context2 */ (function () {
 	 */
 	var register = function (id, rule) {
 		if (_type.isFunction (rule)) {
+			rule = rule.bind (this.interpreter());
 			id = _type.toString (id);
 
-			this.rules[id] = rule.bind (this.interpreter());
+			this.rules[id] = rule;
 
 			return true;
 		}
@@ -123,7 +136,7 @@ Core.register ("Context2", /** @lends Context2 */ (function () {
 	 * @type type
 	 */
 	var execute = function (id, parameters, nodes) {
-		var rule = this.rules[id] || this.rules["default"], result = false;
+		var rule = this.rules[id] || this.rules["_default"], result = false;
 		var _type_reup = _type;
 
 		if (_type.isDefined (rule)) {
