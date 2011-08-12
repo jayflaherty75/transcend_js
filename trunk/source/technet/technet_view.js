@@ -23,8 +23,8 @@ Core.extend ("View", "Container", /** @lends View */ {
 	 * 	logic for rendering a module.
 	 * @constructs
 	 */
-	initialize: function () {
-	},
+	//initialize: function () {
+	//},
 
 	//-------------------------------------------------------------------------
 	/**
@@ -34,9 +34,9 @@ Core.extend ("View", "Container", /** @lends View */ {
 	 * @return Returns the Template object being used by the View
 	 * @type Template
 	 */
-	getTemplate: function () {
+	getTemplate: function (template) {
 		if (Object.isFunction (this.ontemplate))
-			return this.ontemplate ();
+			return this.ontemplate (template);
 		else
 			return null;
 	},
@@ -77,8 +77,8 @@ Core.extend ("TemplateView", "View", /** @lends TemplateView# */ {
 	 * 	interpretation of the template data.
 	 * @return TemplateView
 	 */
-	initialize: function (template, _parent, context) {
-		var _engine = new Template (context);
+	oninit: function (template, _parent, context) {
+		var _engine = Core._("Template", context);
 		var _result = null;
 
 		//---------------------------------------------------------------------
@@ -102,7 +102,11 @@ Core.extend ("TemplateView", "View", /** @lends TemplateView# */ {
 		 * @return Returns the Template being used by the current View
 		 * @type Template
 		 */
-		this.ontemplate = function () { return _engine; };
+		this.ontemplate = function (template) {
+			if (template) _engine = template;
+
+			return _engine;
+		};
 
 		//---------------------------------------------------------------------
 		/**
