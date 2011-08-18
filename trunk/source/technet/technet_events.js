@@ -166,6 +166,9 @@ Core.register ("Multicast",  /** @lends Multicast# */ {
 		 * returned.  If empty, returns undefined.
 		 */
 		this.call = function () {
+			//Note: this commented code returns an array of all return values
+			//instead of propagating via arguments.  In the future, there
+			//should be an option to choose between the two types.
 			/*if (pvt.listeners.length == 1) {
 				return pvt.listeners[0].apply (this, arguments);
 			}
