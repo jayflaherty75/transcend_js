@@ -21,7 +21,11 @@ function () {
 	var initialize = function () {
 		this.link = Core._ ("Property");
 
-		if (_type.isFunction (this.oninit)) this.oninit.apply (this, arguments);
+		if (_type.isFunction (this.oninit)) {
+			var result = this.oninit.apply (this, arguments);
+
+			if (_type.isDefined (result)) return result;
+		}
 	};
 
 	//-------------------------------------------------------------------------
@@ -188,7 +192,7 @@ Core.extend ("Container", "ContainerAbstract", (
  */
 function () {
 	var _type = Core._("Helpers.Type");
-	var _parameters = {};
+	//var _parameters = {};
 
 	//---------------------------------------------------------------------
 	/**
@@ -198,11 +202,11 @@ function () {
 	 * @param {string} key 
 	 * @param {string} value 
 	 */
-	var onset = function (key, value) { _parameters[key] = value; };
+	var onset = function (key, value) { this.parameters[key] = value; };
 
 	//---------------------------------------------------------------------
 	var isset = function (key) {
-		return !!_parameters[key];
+		return !!this.parameters[key];
 	}; 
 
 	//---------------------------------------------------------------------
@@ -216,7 +220,7 @@ function () {
 	 */
 	var onget = function (key) {
 		if (!_type.isUndefined (key))
-			return _parameters[key];
+			return this.parameters[key];
 		else
 			return false;
 	};
@@ -233,7 +237,7 @@ function () {
 	 */
 	var onunset = function (key) {
 		if (!_type.isUndefined (key))
-			delete _parameters[key];
+			delete this.parameters[key];
 	};
 
 	//---------------------------------------------------------------------
@@ -244,10 +248,11 @@ function () {
 	 * @param {Container} dest 
 	 */
 	var oncopy = function (dest) {
-		dest.assign (_parameters);
+		dest.assign (this.parameters);
 	};
 
 	return {
+		parameters:		{},
 		onset:			onset,
 		isset:			isset,
 		onget:			onget,
