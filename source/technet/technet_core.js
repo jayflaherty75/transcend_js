@@ -95,17 +95,23 @@ Core = new (Class.create ( /** @lends Core# */ {
 
 			//If a base class constructor calls an oninit() function, combine
 			//it with the oninit() of the new class.
-			if (typeof (methods.oninit) != "undefined") {
-				if (typeof (parent) != "undefined" && 
-					typeof (parent.prototype) != "undefined" &&
-					typeof (parent.prototype.oninit) == "function") {
-					var mcast = Core._("Multicast",
-						parent.prototype.oninit, 
-						methods.oninit
-					);
+			if (typeof (methods.oninit_override) == "undefined") {
+				if (typeof (methods.oninit) != "undefined") {
+					if (typeof (parent) != "undefined" && 
+						typeof (parent.prototype) != "undefined" &&
+						typeof (parent.prototype.oninit) != "undefined") {
+						var mcast = Core._("Multicast",
+							parent.prototype.oninit, 
+							methods.oninit
+						);
 
-					if (mcast) methods.oninit = mcast;
+						if (mcast) methods.oninit = mcast.call;
+					}
 				}
+			}
+			else {
+				methods.oninit = methods.oninit_override;
+				delete methods["oninit_override"];
 			}
 
 			object = Class.create (parent, methods);

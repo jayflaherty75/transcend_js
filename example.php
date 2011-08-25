@@ -30,14 +30,30 @@
 	<script type="text/javascript">
 		// <![CDATA[
 		window.onload = function () {
+			Core.extend ("DOMContext", "Context2", (function () {
+				var _model = Core._("ElementModel");
+
+				var _default = function (id, parameters, nodes) {
+					
+				};
+
+				var oninit = function () {
+					this.register ("_default", _default);
+				};
+
+				return {
+					oninit: oninit
+				};
+			}) ());
+
 			Core.extend ("Template2", "Interpreter2", {
 				oninit: function (context) {
 					if (Object.isUndefined (context)) {
 						context = Core._("DOMContext");
 					}
-				},
+				}
 
-				apply: function (chunk, target) {
+				/*apply: function (chunk, target) {
 					var context = this.context ();
 					var result = this.run (chunk);
 
@@ -45,7 +61,7 @@
 						context.onapply.bind (this) (target, result);
 
 					return result;
-				}
+				}*/
 			});
 
 			/*
@@ -444,6 +460,9 @@
 			$("test3").appendChild (document.createTextNode ("Bar.Else: " + Core._("Config.Bar.Else") ()));
 			$("test3").appendChild (document.createElement ("br"));
 			$("test3").appendChild (document.createElement ("br"));
+
+			console.log ("Testing Template2:");
+			var context_test = Core._("Template2");
 		};
 		// ]]>
 	</script>

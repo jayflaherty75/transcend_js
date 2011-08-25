@@ -1,13 +1,13 @@
 <?php
 	$output = "";
 	$settings = array (
-		"libfile" => "\\xampp\\htdocs\\clients\\technet_client\\source\\technet\\technet.js",
-		"outfile" => "\\xampp\\htdocs\\clients\\technet_client\\source\\technet\\technet-min.js",
+		"libfile" => "\\xampp\\htdocs\\clients\\technet_client_dam\\source\\technet\\technet.js",
+		"outfile" => "\\xampp\\htdocs\\clients\\technet_client_dam\\source\\technet\\technet-min.js",
 		"jsdoc" => "\\Program Files\\JSDoc\\jsrun.jar",
 		"jsdocrun" => "\\Program Files\\JSDoc\\app\\run.js",
 		"templates" => "\\Program Files\\JSDoc\\templates\\jsdoc",
-		"scripts" => "\\xampp\\htdocs\\clients\\technet_client\\source\\technet",
-		"docs" => "\\xampp\\htdocs\\clients\\technet_client\\docs",
+		"scripts" => "\\xampp\\htdocs\\clients\\technet_client_dam\\source\\technet",
+		"docs" => "\\xampp\\htdocs\\clients\\technet_client_dam\\docs",
 		"compressor" => "\\Program Files\\yuicompressor\\build\\yuicompressor-2.4.2.jar"
 	);
 	$files = array (
