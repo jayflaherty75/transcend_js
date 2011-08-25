@@ -1,14 +1,10 @@
 //-----------------------------------------------------------------------------
 /**
  * @fileoverview Description, required classes, examples
- * 	<br /><br />
  * 
- * 	Date			2011-02-07<br />
  * 	Copyright	&copy; 2011 {@link http://www.jasonkflaherty.com Jason K. Flaherty}<br />
- * 	Bugs<br />
  * @author		{@link http://www.jasonkflaherty.com Jason K. Flaherty}
  * 				{@link mailto:coderx75@hotmail.com coderx75@hotmail.com}
- * @version		0.0.22
  */
 
 //-----------------------------------------------------------------------------
@@ -935,7 +931,7 @@ Core.extend ("ArrayModel", "ModelAbstract", /** @lends ArrayModel */ {
 	 */
 	oninit: function () {
 		this.className ("Array");
-		this.defaultIterator (ArrayIterator);
+		this.defaultIterator (Core.getClass ("ArrayIterator"));
 	},
 
 	oncreate: function () {
@@ -1085,7 +1081,7 @@ Core.extend ("ObjectModel", "ModelAbstract", /** @lends HashModel */ {
 	 */
 	oninit: function () {
 		this.className ("Object");
-		this.defaultIterator (ObjectIterator);
+		this.defaultIterator (Core.getClass ("ObjectIterator"));
 	},
 
 	oncreate: function () {
@@ -1205,7 +1201,7 @@ Core.extend ("ElementModel", "ModelAbstract", /** @lends ElementModel */ {
 	 */
 	oninit: function () {
 		this.className ("Element");
-		this.defaultIterator (ElementIterator);
+		this.defaultIterator (Core.getClass ("ElementIterator"));
 	},
 
 	oncreate: function () {

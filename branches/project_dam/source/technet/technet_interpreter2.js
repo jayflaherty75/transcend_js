@@ -28,7 +28,7 @@ Core.register ("Context2", /** @lends Context2 */ (function () {
 		if (_type.isUndefined (oldval) && (interpreter instanceof Interpreter2)) {
 			//Though the global state should logically be created in the 
 			//interpreter, creating in the context allows the interpreter to be
-			//linked.
+			//"linked".
 			var state = interpreter.get ("_state");
 
 			if (_type.isUndefined (state)) {
@@ -75,13 +75,15 @@ Core.register ("Context2", /** @lends Context2 */ (function () {
 		this.mappings = {};
 		this.interpreter = Core._("Property");
 		this.interpreter.onchange = _interpreter_onchange;
+
+		if (_type.isFunction (this.oninit)) this.oninit.apply (this, arguments);
 	};
 
 	//--------------------------------------------------------------------------
 	/**
 	 * Registers a rule to the given identifier.  The parameters and child nodes
 	 * of any symbol with this identifier will be passed to the given rule.  The
-	 * fule is an anonymous function of the following type:<br/>
+	 * rule is an anonymous function of the following type:<br/>
 	 * <i>boolean function (string id, object parameters, mixed nodes)</i>
 	 * @name Context#register
 	 * @function
@@ -299,6 +301,10 @@ Core.extend ("Interpreter2", "Container", /** @lends Interpreter2 */ (function (
 				result = this.onstart (data);
 
 			if (result) {
+				//TODO: Iterator must be retreived from context mapping first
+				//and then fall back the the default iterator if not provided.
+				//Either that or simply provide the default iterator in the
+				//given model and do away with the context mappings.
 				data = Model.modelize (data);
 				iterator = data.getIterator ();
 
