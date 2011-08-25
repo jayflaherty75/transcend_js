@@ -81,10 +81,12 @@ function () {
 		else {
 			//Check for linked containers and traverse entire chain to
 			//find if key exists and assign it if it does
-			var container = find_key (this, key) || this;
+			var container;
 
-			if (_type.isFunction (container.onset))
+			if (_type.isFunction (container.onset)) {
+				container = find_key (this, key) || this;
 				container.onset (key, value);
+			}
 		}
 
 		return this;
@@ -202,7 +204,7 @@ function () {
 
 	//---------------------------------------------------------------------
 	var isset = function (key) {
-		return !!_parameters[key];
+		return _type.isDefined (_parameters[key]);
 	}; 
 
 	//---------------------------------------------------------------------
