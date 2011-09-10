@@ -23,7 +23,7 @@ Core.extend ("View", "Container", /** @lends View */ {
 	 * 	logic for rendering a module.
 	 * @constructs
 	 */
-	//initialize: function () {
+	//oninit: function () {
 	//},
 
 	//-------------------------------------------------------------------------
