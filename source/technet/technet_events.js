@@ -4,10 +4,10 @@
  * @fileoverview Event casting system designed to bridge the gap between 
  * application and DOM events while allowing for complex interactions to be
  * easily implemented.  "Target" objects define their own hook-in functions
- * which may then be broadcast by the event system.  A Broadcast may be created
+ * which may then be eventcast by the event system.  A Eventcast may be created
  * to handle a specific type of event but may receive these calls from multiple
- * targets.  Multiple broadcasts may be assigned to the same target event.
- * Once created, other modules may then "listen" in on the Broadcast.<br /><br />
+ * targets.  Multiple Eventcasts may be assigned to the same target event.
+ * Once created, other modules may then "listen" in on the Eventcast.<br /><br />
  * 
  * 	Date		2011-02-01<br />
  * 	Copyright	&copy; 2011 {@link http://www.jasonkflaherty.com Jason K. Flaherty}<br />
@@ -62,10 +62,10 @@ Core.register ("Multicast",  /** @lends Multicast# */ {
 		 */
 		this.listen = function (listener) {
 			if (Object.isFunction (listener)) {
-				if (listener.multicast && listener.multicast != this) {
-					listener.multicast.combine (pvt);
-				}
-				else {
+				//if (listener.multicast && listener.multicast != this) {
+				//	listener.multicast.combine (pvt);
+				//}
+				//else {
 					if (!Object.isFunction  (listener.ignore)) {
 						listener.ignore = function () {
 							this.ignore (listener);
@@ -73,7 +73,7 @@ Core.register ("Multicast",  /** @lends Multicast# */ {
 					}
 
 					pvt.listeners.push (listener);
-				}
+				//}
 			}
 			else {
 				throw new TypeError ("Multicast.listen(): Parameter 1 " +
@@ -206,24 +206,24 @@ Core.register ("Multicast",  /** @lends Multicast# */ {
 });
 
 //-----------------------------------------------------------------------------
-Core.extend ("Broadcast", "Multicast", /** @lends Broadcast# */ {
+Core.extend ("Eventcast", "Multicast", /** @lends Eventcast# */ {
 	/**
 	 * @class Manages a type of event for a group of target objects and allows 
 	 * 	external code to "listen" for that event from any of the targets.  
-	 * 	Broadcasts may multiple targets and multiple listeners, making it a 
-	 * 	many-to-one-to-many design.  Targets may have separate broadcasts for 
-	 * 	each event but may also have multiple broadcasts of the same event, 
+	 * 	Eventcasts may multiple targets and multiple listeners, making it a 
+	 * 	many-to-one-to-many design.  Targets may have separate Eventcasts for 
+	 * 	each event but may also have multiple Eventcasts of the same event, 
 	 * 	allowing for any configuration and for very complex interactions to be 
 	 * 	easily implemented.<br /><br />
 	 * 
 	 * 	Hook-in function is only set if there are targets and listeners for the
-	 * 	broadcast.  No resources are wasted on empty calls.<br /><br />
+	 * 	Eventcast.  No resources are wasted on empty calls.<br /><br />
 	 * @extends Multicast
 	 * @constructs
-	 * @param {string} event_name Name of event to broadcast
+	 * @param {string} event_name Name of event to cast
 	 * @param {any} memo Miscellaneous data to be passed along with event
 	 * @param {object} targets Any number of target object parameters (optional)
-	 * @return Broadcast
+	 * @return Eventcast
 	 */
 	initialize: function ($super, event_name, memo) {
 		$super ();
@@ -240,7 +240,7 @@ Core.extend ("Broadcast", "Multicast", /** @lends Broadcast# */ {
 		 * Handler function to be assigned to object's hook-in.  This calls
 		 * <i>Multicast.call()</i> method along with event parameters sent
 		 * by target object.
-		 * @name Broadcast-multi_handler
+		 * @name Eventcast#multi_handler
 		 * @function
 		 * @param {...} Anything the original object sent
 		 * @return Any value passed back to target by the listener (or Array 
@@ -262,11 +262,11 @@ Core.extend ("Broadcast", "Multicast", /** @lends Broadcast# */ {
 
 		//--------------------------------------------------------------------
 		/**
-		 * Adds Broadcast function to target hook-in
-		 * @name Broadcast-add_handler
+		 * Adds Eventcast function to target hook-in
+		 * @name Eventcast#add_handler
 		 * @function
 		 * @param {object} target
-		 * @return Function added to Broadcast hook-in.
+		 * @return Function added to Eventcast hook-in.
 		 * @type function
 		 * @private
 		 */
@@ -291,8 +291,8 @@ Core.extend ("Broadcast", "Multicast", /** @lends Broadcast# */ {
 
 		//--------------------------------------------------------------------
 		/**
-		 * Removes Broadcast function from target hook-in
-		 * @name Broadcast-remove_handler
+		 * Removes Eventcast function from target hook-in
+		 * @name Eventcast#remove_handler
 		 * @function
 		 * @param {object} target
 		 * @param {function} func
@@ -311,8 +311,8 @@ Core.extend ("Broadcast", "Multicast", /** @lends Broadcast# */ {
 
 		//--------------------------------------------------------------------
 		/**
-		 * Returns the event type being broadcast
-		 * @name Broadcast#getType
+		 * Returns the event type being Eventcast
+		 * @name Eventcast#getType
 		 * @function
 		 * @return Name of event type
 		 * @type string
@@ -323,34 +323,40 @@ Core.extend ("Broadcast", "Multicast", /** @lends Broadcast# */ {
 
 		//--------------------------------------------------------------------
 		/**
-		 * Adds a target object to the broadcast.  Events of the specified 
-		 * type from thi target will be broadcast from this point on.
-		 * @name Broadcast#add
+		 * Adds a target object to the Eventcast.  Events of the specified 
+		 * type from thi target will be Eventcast from this point on.
+		 * @name Eventcast#add
 		 * @function
 		 * @param {object} target
 		 * @throws {TypeError} Parameter 1 must be a function
-		 * @return Returns Broadcast object for chain calls
-		 * @type Broadcast
+		 * @return Returns Eventcast object for chain calls
+		 * @type Eventcast
 		 */
-		this.add = function (target) {
+		this.add = function () {
 			var uid;
 			var func = null;
 
-			if (typeof (target) == "object" || typeof (target) == "function") {
-				uid = target["_bcast_id"];
+			for (i = 0; i < arguments.length; i++) {
+				var target = arguments[i];
 
-				if (!uid) {
-					uid = Core._("Helpers.Unique").simple();
-					target["_bcast_id"] = uid;
+				if (Object.isArray (target))
+					$A(target).each (function (t) {
+						if (typeof (t) != "undefined") this.add (t);
+					}.bind (this));
+				else if (typeof (target) != "undefined") {
+					if (typeof (target) == "object" || typeof (target) == "function") {
+						uid = target["_bcast_id"];
+
+						if (!uid) {
+							uid = Core._("Helpers.Unique").simple();
+							target["_bcast_id"] = uid;
+						}
+
+						if (this.count () > 0) func = add_handler (target);
+
+						pvt.targets[uid] = ({ "target": target, "func": func });
+					}
 				}
-
-				if (this.count () > 0) func = add_handler (target);
-
-				pvt.targets[uid] = ({ "target": target, "func": func });
-			}
-			else {
-				throw new TypeError ("Broadcast.add(): Parameter 1 " +
-					"must be an object");
 			}
 
 			return this;
@@ -358,21 +364,22 @@ Core.extend ("Broadcast", "Multicast", /** @lends Broadcast# */ {
 
 		//--------------------------------------------------------------------
 		/**
-		 * Removes a target object from the broadcast.
-		 * @name Broadcast#remove
+		 * Removes a target object from the Eventcast.
+		 * @name Eventcast#remove
 		 * @function
 		 * @param {object} target
 		 * @throws {TypeError} Parameter 1 must be a function
-		 * @return Returns Broadcast object for chain calls
-		 * @type Broadcast
+		 * @return Returns Eventcast object for chain calls
+		 * @type Eventcast
 		 */
 		this.remove = function (target) {
+			//TODO: allow multiple arguments and arrays of objects (see add())
 			if (typeof (target) == "object") {
 				remove_handler (target, pvt.targets[target._bcast_id].func);
 				delete pvt.targets[target._bcast_id];
 			}
 			else {
-				throw new TypeError ("Broadcast.remove(): Parameter 1 " +
+				throw new TypeError ("Eventcast.remove(): Parameter 1 " +
 					"must be an object");
 			}
 
@@ -381,10 +388,10 @@ Core.extend ("Broadcast", "Multicast", /** @lends Broadcast# */ {
 
 		//--------------------------------------------------------------------
 		/**
-		 * Adds a listener to the broadcast.  Will be called any time one of
+		 * Adds a listener to the Eventcast.  Will be called any time one of
 		 * the target objects fires off an event of the type specified to the
 		 * constructor.
-		 * @name Broadcast#listen
+		 * @name Eventcast#listen
 		 * @function
 		 * @param {function} listener
 		 * @throws {TypeError} Parameter 1 must be a function
@@ -405,8 +412,8 @@ Core.extend ("Broadcast", "Multicast", /** @lends Broadcast# */ {
 
 		//--------------------------------------------------------------------
 		/**
-		 * Removes listener function from the broadcast.
-		 * @name Broadcast#ignore
+		 * Removes listener function from the Eventcast.
+		 * @name Eventcast#ignore
 		 * @function
 		 * @param {function} listener
 		 * @throws {TypeError} Parameter 1 must be a function
@@ -442,12 +449,7 @@ Core.extend ("Broadcast", "Multicast", /** @lends Broadcast# */ {
 		for (i = 3; i < arguments.length; i++) {
 			var targets = arguments[i];
 
-			if (Object.isArray (targets))
-				$A(targets).each (function (target) {
-					if (typeof (target) != "undefined") 
-						this.add (target);
-				}.bind (this));
-			else if (typeof (targets) != "undefined")
+			if (typeof (targets) != "undefined")
 				this.add (targets);
 		}
 	}

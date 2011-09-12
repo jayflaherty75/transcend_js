@@ -8,38 +8,37 @@
  *  functions.
  * 	<br /><br />
  * 
- * 	Date			2011-02-02<br />
  * 	Copyright	&copy; 2011 {@link http://www.jasonkflaherty.com Jason K. Flaherty}<br />
  * 	Bugs<br />
  * @author		{@link http://www.jasonkflaherty.com Jason K. Flaherty}
  * 				{@link mailto:coderx75@hotmail.com coderx75@hotmail.com}
- * @version		0.0.22
  */
 
 //-----------------------------------------------------------------------------
-Core.extend ("View", "Container", /** @lends View */ {
+Core.extend ("View", "Container", /** @lends View */ (function () {
 	/**
 	 * @class View class that may be extended to a child class containing
 	 * 	logic for rendering a module.
 	 * @constructs
 	 */
-	initialize: function () {
-	},
+	var oninit =  function () {
+		this.engine = Core._("Property");
+	};
 
 	//-------------------------------------------------------------------------
 	/**
 	 * For views utilizing templates, returns the template.
-	 * @name View#getTemplate
+	 * @name View#getEngine
 	 * @function
 	 * @return Returns the Template object being used by the View
 	 * @type Template
 	 */
-	getTemplate: function () {
-		if (Object.isFunction (this.ontemplate))
-			return this.ontemplate ();
-		else
-			return null;
-	},
+	//var get_engine = function () {
+	//	if (Object.isFunction (this.onengine))
+	//		return this.onengine ();
+	//	else
+	//		return null;
+	//};
 
 	//-------------------------------------------------------------------------
 	/**
@@ -50,7 +49,7 @@ Core.extend ("View", "Container", /** @lends View */ {
 	 * @return Returns any data returned by the <i>onrender()</i> handler.
 	 * @type Any
 	 */
-	render: function (parent) {
+	var render = function (parent) {
 		var result;
 		if (Object.isFunction (this.onprerender)) this.onprerender (parent);
 		if (Object.isFunction (this.onrender))
@@ -59,12 +58,17 @@ Core.extend ("View", "Container", /** @lends View */ {
 			result = this.onpostrender (result);
 
 		return result;
-	}
+	};
 
-});
+	return {
+		oninit: oninit,
+		//getEngine: get_engine,
+		render: render
+	};
+}) ());
 
 //-----------------------------------------------------------------------------
-Core.extend ("TemplateView", "View", /** @lends TemplateView# */ {
+Core.extend ("TemplateView", "View", /** @lends TemplateView# */ (function () {
 	/**
 	 * @class Default view providing integration with {@link Template} 
 	 * 	instances.
@@ -77,9 +81,14 @@ Core.extend ("TemplateView", "View", /** @lends TemplateView# */ {
 	 * 	interpretation of the template data.
 	 * @return TemplateView
 	 */
-	initialize: function (template, _parent, context) {
-		var _engine = new Template (context);
-		var _result = null;
+	var oninit = function (template, _parent, context) {
+		var _context = Core._("NodeContext");
+		var _model = Core._("DomModel");
+		var _engine = Core._("Template2", _context);
+
+		_engine.model (_model);
+
+		this.engine (_engine);
 
 		//---------------------------------------------------------------------
 		/**
@@ -102,7 +111,7 @@ Core.extend ("TemplateView", "View", /** @lends TemplateView# */ {
 		 * @return Returns the Template being used by the current View
 		 * @type Template
 		 */
-		this.ontemplate = function () { return _engine; };
+		//this.ontemplate = function () { return _engine; };
 
 		//---------------------------------------------------------------------
 		/**
@@ -112,7 +121,7 @@ Core.extend ("TemplateView", "View", /** @lends TemplateView# */ {
 		 * @param {string} key 
 		 * @param {string} value 
 		 */
-		this.onset = _engine.onset;
+		this.onset = _engine.onset.bind (_engine);
 
 		//---------------------------------------------------------------------
 		/**
@@ -123,7 +132,10 @@ Core.extend ("TemplateView", "View", /** @lends TemplateView# */ {
 		 * @return Returns the value from the given key.
 		 * @type Any
 		 */
-		this.onget = _engine.onget;
+		this.onget = _engine.onget.bind (_engine);
+
+		//---------------------------------------------------------------------
+		this.isset = _engine.isset.bind (_engine);
 
 		//---------------------------------------------------------------------
 		/**
@@ -134,7 +146,7 @@ Core.extend ("TemplateView", "View", /** @lends TemplateView# */ {
 		 * @return Returns the deleted value from the given key.
 		 * @type Any
 		 */
-		this.onunset = _engine.onunset;
+		this.onunset = _engine.onunset.bind (_engine);
 
 		//---------------------------------------------------------------------
 		/**
@@ -151,7 +163,7 @@ Core.extend ("TemplateView", "View", /** @lends TemplateView# */ {
 		};
 
 		this._ = this.getElement;
-	}
+	};
 
 	//-------------------------------------------------------------------------
 	/*
@@ -162,7 +174,10 @@ Core.extend ("TemplateView", "View", /** @lends TemplateView# */ {
 	 * @param {string} id 
 	 */
 	//getElement: function (id) { this.getTemplate()._(id); }
-});
+	return {
+		oninit: oninit
+	};
+}) ());
 
 //-----------------------------------------------------------------------------
 Core._("Helpers").register ("View", /** @lends ViewHelpers# */ {
@@ -284,6 +299,33 @@ Core._("Helpers").register ("View", /** @lends ViewHelpers# */ {
 		}
 
 		return color;
+	},
+
+	//-------------------------------------------------------------------------
+	/**
+	 * Recursively builds the position of an element relative to the document
+	 * root or, if an element ID is provided, to the respective element.
+	 * @name ViewHelpers#findPosition
+	 * @function
+	 * @param {Element} Element object for the position request
+	 * @param {string} Optional.  The ID of a root element for a relative position. 
+	 * @return Returns an array [x, y] containing the position of the element.
+	 * @type Array
+	 */
+	findPosition: function (obj, root) {
+		var curleft = 0, curtop = 0;
+
+		if (obj.offsetParent) {
+			root = root || "app_frame";
+
+			do {
+				curleft += obj.offsetLeft;
+				curtop += obj.offsetTop;
+				obj = obj.offsetParent;
+			} while (obj && obj.id != root);
+		}
+
+		return [curleft,curtop];
 	}
 });
 

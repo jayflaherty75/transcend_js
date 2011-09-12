@@ -17,6 +17,9 @@
 		"technet_container.js", 
 		"technet_events.js", 
 		"technet_interpreter.js", 
+		"technet_interpreter2.js", 
+		"technet_template.js", 
+		"technet_template2.js",
 		"technet_process.js",
 		"technet_controller.js",
 		"technet_model.js",
@@ -28,7 +31,24 @@
 	$exec_compress = "java -jar \"" . $settings["compressor"] . "\" -v " . 
 		$settings["libfile"] . " -o " . $settings["outfile"];
 
-	echo ("<pre>Exporting documentation...\r\n\r\n");
+	echo ("<pre>Removing existing files...\r\n\r\n");
+	echo ($exec_docs . "\r\n\r\n");
+
+	if (unlink ($settings["libfile"])) {
+		echo ($settings["libfile"] . " deleted.");
+	}
+	else {
+		echo ($settings["libfile"] . " not found.");
+	}
+
+	if (unlink ($settings["outfile"])) {
+		echo ($settings["outfile"] . " deleted.");
+	}
+	else {
+		echo ($settings["outfile"] . " not found.");
+	}
+
+		echo ("<pre>Exporting documentation...\r\n\r\n");
 	echo ($exec_docs . "\r\n\r\n");
 
 	system ($exec_docs);

@@ -25,8 +25,9 @@ Core = new (Class.create ( /** @lends Core# */ {
 	 * @constructs
 	 */
 	initialize: function () {
+		var _toString = Object.prototype.toString;
 		var _objects = {};
-		var _events = {};
+		var _events = { global: {}};
 		var _instances = {};
 		var _instance_count = 1;
 
@@ -156,6 +157,39 @@ Core = new (Class.create ( /** @lends Core# */ {
 
 		//--------------------------------------------------------------------
 		/**
+		 * Provides a quick and easy method of firing an event from an object.
+		 * Typically, an object would check for the existance of a handler
+		 * function and call it.  This carries little overhead and is the 
+		 * prefered method.  Although this method carries a lot of overhead,
+		 * however, it provides the option of brevity.
+		 * @name Core#trigger
+		 * @function
+		 * @param {mixed} object The object triggering the event
+		 * @param {string} event The name of the event, such as "click"
+		 * @param {varargs} ... Listener function
+		 * @return Anything returned from the handler or false if no handler
+		 * 	was present.
+		 * @type mixed|false
+		 */
+		this.trigger = function () {
+			var args = $A(arguments);
+			var object = args.shift ();
+			var event = "on" + args.shift ();
+			var handler = object[event];
+
+			if (typeof (handler) != "undefined") {
+				if (!Event.isEvent (args[0])) {
+					args.unshift (window.event || { clientX: 0 });
+				}
+
+				return handler.apply (object, args);
+			}
+
+			return false;
+		};
+
+		//--------------------------------------------------------------------
+		/**
 		 * Registers an event, allowing it to be accessed from the global
 		 * environment.  The <i>namespace</i> parameter allows for events to 
 		 * be grouped into categories to help avoid naming collisions.  The
@@ -167,7 +201,7 @@ Core = new (Class.create ( /** @lends Core# */ {
 		 * @function
 		 * @param {string} namespace Identifier allowing events to be grouped
 		 * @param {string} name Arbitrary event identifier
-		 * @param {Broadcast} bcast Broadcast to be registered
+		 * @param {Eventcast} bcast Eventcast to be registered
 		 */
 		this.event = function (namespace, name, bcast) {
 			var events;
@@ -189,15 +223,15 @@ Core = new (Class.create ( /** @lends Core# */ {
 
 		//--------------------------------------------------------------------
 		/**
-		 * Allows for a registered Broadcast to be listened to by a listener
+		 * Allows for a registered Eventcast to be listened to by a listener
 		 * function.
 		 * @name Core#listen
 		 * @function
 		 * @param {string} namespace Identifier of event group
 		 * @param {string} name Event identifier
 		 * @param {function} func Listener function
-		 * @return Returns the Broadcast listened to
-		 * @type Broadcast
+		 * @return Returns the Eventcast listened to
+		 * @type Eventcast
 		 */
 		this.listen = function (namespace, name, func) {
 			var bcast = null;
@@ -318,11 +352,11 @@ Core = new (Class.create ( /** @lends Core# */ {
 		 */
 		this.getID = function (object) {
 			if (typeof (object) != "undefined") {
-				if (typeof (object.id) == "undefined") {
+				if (typeof (object._uid) == "undefined") {
 					return this.setID (object);
 				}
 
-				return object.id;
+				return object._uid;
 			}
 
 			return false;
@@ -340,9 +374,9 @@ Core = new (Class.create ( /** @lends Core# */ {
 		 */
 		this.setID = function (object, identifier) {
 			if (typeof (object) != "undefined") {
-				object.id = identifier || this._("Helpers.Unique").hex ();
+				object._uid = identifier || this._("Helpers.Unique").hex ();
 
-				return object.id;
+				return object._uid;
 			}
 
 			return false;
@@ -409,15 +443,19 @@ Core = new (Class.create ( /** @lends Core# */ {
 			 * @type string
 			 */
 			getType: function (evt) {
-				if (evt.tn_type)
-					return evt.tn_type;
-				else if (evt.type)
-					return evt.type;
+				if (evt) {
+					if (evt.tn_type)
+						return evt.tn_type;
+					else if (evt.type)
+						return evt.type;
+				}
+
+				return false;
 			},
 
 			/**
 			 * IE workaround to read event target object set by Tech Net.
-			 * Any object event (hook-in) may be broadcast.
+			 * Any object event (hook-in) may be Eventcast.
 			 * @name Event#getTarget
 			 * @function
 			 * @param {Event} evt Any valid Event object
@@ -425,12 +463,16 @@ Core = new (Class.create ( /** @lends Core# */ {
 			 * @type object
 			 */
 			getTarget: function (evt) {
-				if (evt.tn_target)
-					return evt.tn_target;
-				else if (evt.target)
-					return evt.target;
-				else if (evt.srcElement)
-					return evt.srcElement;
+				if (evt) {
+					if (evt.tn_target)
+						return evt.tn_target;
+					else if (evt.target)
+						return evt.target;
+					else if (evt.srcElement)
+						return evt.srcElement;
+				}
+
+				return false;
 			},
 
 			/**
@@ -607,7 +649,7 @@ Core.register ("Property", /** @lends Property# */ function () {
 	 * 	read but also calls <b>onassign</b> and <b>onchange</b> handlers to 
 	 * 	allow for control of the property or to allow code to listen for 
 	 * 	access to the property.  These events may be listened to by event 
-	 * 	<i>Broadcast</i> objects.
+	 * 	<i>Eventcast</i> objects.
 	 * @constructs
 	 * @param {Any} Initial value
 	 * @param {any} Memo passed to handler functions
