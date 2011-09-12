@@ -25,7 +25,7 @@ Core.register ("Context2", /** @lends Context2 */ (function () {
 	var _type = Core._("Helpers.Type");
 
 	var _interpreter_onchange = function (interpreter, oldval) {
-		if (_type.isUndefined (oldval) && (interpreter instanceof Interpreter2)) {
+		if (_type.isUndefined (oldval) && (interpreter instanceof Core.getClass ("Interpreter2"))) {
 			//Though the global state should logically be created in the 
 			//interpreter, creating in the context allows the interpreter to be
 			//"linked".
@@ -33,32 +33,30 @@ Core.register ("Context2", /** @lends Context2 */ (function () {
 
 			if (_type.isUndefined (state)) {
 				state = {
-					a: 0,					//Accumulator
+					a: 0,						//Accumulator
 					e: {
-						message: false,		//Error message
-						trace: new Array ()	//Stack trace
+						message: false,			//Error message
+						trace: new Array (),	//Stack trace
+						warnings: new Array()	//Non-critical messages
 					}
 				};
 
 				interpreter.assign ("_state", state);
 			}
 
+			if (_type.isFunction (this.onstart)) 
+				interpreter.onstart = this.onstart;
+
+			if (_type.isFunction (this.onresult))
+				interpreter.onresult = this.onresult;
+
+			if (_type.isFunction (this.oncomplete))
+				interpreter.oncomplete = this.oncomplete;
+
 			return interpreter;
 		}
 
 		return oldval;
-	};
-
-	var _onstart = function (code) {
-		return true;
-	};
-
-	var _onresult = function (command, result) {
-		return true;
-	};
-
-	var _oncomplete = function (result) {
-		return true;
 	};
 
 	//--------------------------------------------------------------------------
@@ -72,9 +70,8 @@ Core.register ("Context2", /** @lends Context2 */ (function () {
 	 */
 	var initialize = function () {
 		this.rules = {};
-		this.mappings = {};
 		this.interpreter = Core._("Property");
-		this.interpreter.onchange = _interpreter_onchange;
+		this.interpreter.onchange = _interpreter_onchange.bind (this);
 
 		if (_type.isFunction (this.oninit)) this.oninit.apply (this, arguments);
 	};
@@ -95,30 +92,13 @@ Core.register ("Context2", /** @lends Context2 */ (function () {
 	 */
 	var register = function (id, rule) {
 		if (_type.isFunction (rule)) {
-			rule = rule.bind (this.interpreter());
 			id = _type.toString (id);
-
 			this.rules[id] = rule;
 
 			return true;
 		}
 
 		return false;
-	};
-
-	//--------------------------------------------------------------------------
-	/**
-	 * Overrides the default iterator for a set of symbols within a specific 
-	 * model.  The type may be interpreted as any structure, model or basic data 
-	 * type.
-	 * @name Context#map
-	 * @function
-	 * @param {string} type Name of the type as evaluated by <i>Helpers.Type.getType()</i>
-	 * @param {string} iterator_name Name of a valid iterator capable of
-	 * 	traversing the given type
-	 */
-	var map = function (type, iterator_name) {
-		this.mappings[type] = iterator_name;
 	};
 
 	//--------------------------------------------------------------------------
@@ -131,18 +111,19 @@ Core.register ("Context2", /** @lends Context2 */ (function () {
 	 * trace. 
 	 * @name Context#execute
 	 * @function
+	 * @param {Interpreter} interpreter Description
 	 * @param {string} id Description
 	 * @param {object} parameters Description
 	 * @param {mixed} nodes Description
 	 * @return Description
 	 * @type type
 	 */
-	var execute = function (id, parameters, nodes) {
+	var execute = function (interpreter, id, parameters, nodes) {
 		var rule = this.rules[id] || this.rules["_default"], result = false;
 		var _type_reup = _type;
 
 		if (_type.isDefined (rule)) {
-			result = rule (parameters, nodes);
+			result = rule.bind (interpreter) (id, parameters, nodes);
 
 			if (!result) {
 				var interpreter = this.interpreter();
@@ -236,6 +217,7 @@ Core.extend ("Interpreter2", "Container", /** @lends Interpreter2 */ (function (
 	var oninit = function (context, handler) {
 		var default_state = null;
 		var _unbinded_handler;
+		var _type_reup = _type;
 
 		var _command_state = new (function () {
 			return {
@@ -245,12 +227,33 @@ Core.extend ("Interpreter2", "Container", /** @lends Interpreter2 */ (function (
 			};
 		}) ();
 
-		if (_type.isFunction (handler))
-			_unbinded_handler = handler;
-		else
-			_unbinded_handler = _handler;
+		//if (_type.isFunction (handler))
+		//	_unbinded_handler = handler;
+		//else
+		//	_unbinded_handler = _handler;
+
+		this.model = Core._("Property");
+		this.code = Core._("Property");
 
 		this.context = Core._("Property");
+		this.context.onchange = function (context, oldvalue) {
+			if (context instanceof Core.getClass ("Context2")) {
+				context.interpreter (this);
+				return context;
+			}
+			return oldvalue;
+		}.bind (this);
+
+		this.handler = Core._("Property");
+		this.handler.onchange = function (newhandler, oldhandler) {
+			if (_type_reup.isFunction (newhandler)) {
+				_unbinded_handler = newhandler;
+
+				return newhandler.bind (_command_state);
+			}
+
+			return oldhandler;
+		}.bind (this);
 
 		this.getState = function () {
 			return _command_state;
@@ -271,15 +274,18 @@ Core.extend ("Interpreter2", "Container", /** @lends Interpreter2 */ (function (
 		 * @type Interpreter2
 		 */
 		this.spawn = function () {
-			return Core._("Interpreter2", this.context(), _unbinded_handler);
+			var instance = Core._("Interpreter2", this.context(), _unbinded_handler);
+
+			instance.link (this);
+			instance.model (this.model ());
+
+			return instance;
 		};
 
-		if (context instanceof Context2) {
-			context.interpreter (this);
-			this.context (context);
-		}
+		if (context) this.context (context);
 
-		this.handler = _unbinded_handler.bind (_command_state);
+		//this.handler = _unbinded_handler.bind (_command_state);
+		this.handler (_type.isFunction (handler) ? handler : _handler);
 	};
 
 	//--------------------------------------------------------------------------
@@ -289,42 +295,47 @@ Core.extend ("Interpreter2", "Container", /** @lends Interpreter2 */ (function (
 	 * @function
 	 * @param {Iterator} iterator Description
 	 * @return Description
-	 * @type type
+	 * @type mixed|false
 	 */
-	var run = function (data) {
+	var run = function (code) {
 		var context = this.context ();
 		var state = this.get ("_state");
 		var iterator, command, result = true;
 
-		if (_type.isDefined (data)) {
+		code = code || this.code ();
+
+		if (_type.isDefined (code)) {
 			if (_type.isFunction (this.onstart))
-				result = this.onstart (data);
+				result = this.onstart (code);
 
 			if (result) {
 				//TODO: Iterator must be retreived from context mapping first
 				//and then fall back the the default iterator if not provided.
 				//Either that or simply provide the default iterator in the
 				//given model and do away with the context mappings.
-				data = Model.modelize (data);
-				iterator = data.getIterator ();
+				code = Core._("Model").modelize (code);
+				iterator = code.getIterator ();
 
 				this.iterator = iterator;
 				this.symbol = iterator.first ();
 
 				do {
 					this.resetState ();
-					this.handler (Object.clone (this.symbol));
+					this.handler () (Object.clone (this.symbol));
 					command = this.getState ();
-					result = context.execute (command.id, command.parameters, command.nodes);
+					result = _type.isDefined (command.id) ? context.execute (this, command.id, command.parameters, command.nodes) : false;
 					if (_type.isFunction (this.onresult))
 						result = this.onresult (command, result);
 
 					this.symbol = this.iterator.next ();
 				} while (!this.iterator.isEnd() && result);
+
+				if (_type.isFunction (this.oncomplete))
+					result = this.oncomplete (code);
 			}
 
-			if (_type.isFunction (this.oncomplete))
-				result = this.oncomplete (data);
+			if (result === false && _type.isFunction (this.onfailure))
+				this.onfailure (code);
 
 			return result;
 		}
@@ -348,8 +359,8 @@ Core.extend ("Interpreter2", "Container", /** @lends Interpreter2 */ (function (
 	 */
 	test: function () {
 		var _type = Core._("Helpers.Type");
-		var context = new Context2 ();
-		var interpreter = new Interpreter2 (context);
+		var context = Core._("Context2");
+		var interpreter = Core._("Interpreter2", context);
 		var hw = [
 			{ action: "foreach", data: "message", _nodes: [
 				{ action: "print" },
@@ -367,7 +378,7 @@ Core.extend ("Interpreter2", "Container", /** @lends Interpreter2 */ (function (
 		var _output;
 		var result = true;
 
-		context.register ("foreach", function (params, nodes) {
+		context.register ("foreach", function (id, params, nodes) {
 			var name = params["data"];
 			var data = Model.modelize (this.get (name));
 			var iterator = data.getIterator ();
@@ -385,7 +396,7 @@ Core.extend ("Interpreter2", "Container", /** @lends Interpreter2 */ (function (
 			return result;
 		});
 
-		context.register ("print", function (params) {
+		context.register ("print", function (id, params) {
 			var text = params["text"] || this.get ("_state")["d"];
 
 			if (text != "_World") {

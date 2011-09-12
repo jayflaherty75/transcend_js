@@ -9,8 +9,7 @@
  */
 
 //-----------------------------------------------------------------------------
-Core.register ("ContainerAbstract",  /** @lends Container */ (
-function () {
+Core.register ("ContainerAbstract",  /** @lends Container */ (function () {
 	/**
 	 * @class Basic container providing a generic interface for assigning
 	 * 	values to objects.
@@ -19,9 +18,21 @@ function () {
 	var _type = Core._("Helpers.Type");
 
 	var initialize = function () {
+		var result;
+
 		this.link = Core._ ("Property");
 
-		if (_type.isFunction (this.oninit)) this.oninit.apply (this, arguments);
+		if (_type.isFunction (this.onpreinit))
+			this.onpreinit.apply (this, arguments);
+
+		if (_type.isFunction (this.oninit)) {
+			result = this.oninit.apply (this, arguments);
+
+			if (_type.isFunction (this.onpostinit))
+				result = this.onpostinit (result);
+
+			if (_type.isDefined (result)) return result;
+		}
 	};
 
 	//-------------------------------------------------------------------------
@@ -39,16 +50,13 @@ function () {
 	 */
 	var find_key = function (container, key) {
 		if (_type.isFunction (container.isset)) {
-			if (container.isset (key)) {
-				return container;
-			}
-			else {
-				if (!_type.isUndefined (container.link)) {
-					container = container.link ();
+			if (container.isset (key)) return container;
+		}
 
-					if (container) find_key (container, key);
-				}
-			}
+		if (_type.isDefined (container.link)) {
+			container = container.link ();
+
+			if (container) return find_key (container, key);
 		}
 
 		return false;
@@ -81,10 +89,9 @@ function () {
 		else {
 			//Check for linked containers and traverse entire chain to
 			//find if key exists and assign it if it does
-			var container;
+			var container = find_key (this, key) || this;
 
 			if (_type.isFunction (container.onset)) {
-				container = find_key (this, key) || this;
 				container.onset (key, value);
 			}
 		}
@@ -142,6 +149,21 @@ function () {
 
 	//-------------------------------------------------------------------------
 	/**
+	 * Description
+	 * @name ContainerAbstract#keys
+	 * @function
+	 * @return Array containing set of local keys (does not include linkages) 
+	 * @type Array|false
+	 */
+	var keys = function () {
+		if (_type.isFunction (this.onkeys))
+			return this.onkeys ();
+
+		return false;
+	};
+
+	//-------------------------------------------------------------------------
+	/**
 	 * Deletes the value from the given key.  Triggers the <i>onunset()</i> handler
 	 * of the Interpreter instance
 	 * @name ContainerAbstract#clear
@@ -176,6 +198,7 @@ function () {
 		assign:			assign,
 		exists:			exists,
 		get:			get,
+		keys:			keys,
 		clear:			clear,
 		copy:			copy
 	};
@@ -190,7 +213,16 @@ Core.extend ("Container", "ContainerAbstract", (
  */
 function () {
 	var _type = Core._("Helpers.Type");
-	var _parameters = {};
+
+	//---------------------------------------------------------------------
+	/**
+	 * Description.
+	 * @name Container#oninit
+	 * @function
+	 */
+	var oninit = function () {
+		this.parameters = {};
+	};
 
 	//---------------------------------------------------------------------
 	/**
@@ -200,11 +232,17 @@ function () {
 	 * @param {string} key 
 	 * @param {string} value 
 	 */
-	var onset = function (key, value) { _parameters[key] = value; };
+	var onset = function (key, value) { this.parameters[key] = value; };
 
 	//---------------------------------------------------------------------
+	/**
+	 * Description.
+	 * @name Container#isset
+	 * @function
+	 * @param {string} key 
+	 */
 	var isset = function (key) {
-		return _type.isDefined (_parameters[key]);
+		return _type.isDefined (this.parameters[key]);
 	}; 
 
 	//---------------------------------------------------------------------
@@ -218,9 +256,27 @@ function () {
 	 */
 	var onget = function (key) {
 		if (!_type.isUndefined (key))
-			return _parameters[key];
+			return this.parameters[key];
 		else
 			return false;
+	};
+
+	//---------------------------------------------------------------------
+	/**
+	 * Description
+	 * @name Container#onkeys
+	 * @function
+	 * @return Returns an array of existing keys from the local container.
+	 * @type Array|false
+	 */
+	var onkeys = function () {
+		var set = new Array ();
+
+		for (key in this.parameters) {
+			set.push (key);
+		}
+
+		return set;
 	};
 
 	//---------------------------------------------------------------------
@@ -235,7 +291,7 @@ function () {
 	 */
 	var onunset = function (key) {
 		if (!_type.isUndefined (key))
-			delete _parameters[key];
+			delete this.parameters[key];
 	};
 
 	//---------------------------------------------------------------------
@@ -246,17 +302,76 @@ function () {
 	 * @param {Container} dest 
 	 */
 	var oncopy = function (dest) {
-		dest.assign (_parameters);
+		dest.assign (this.parameters);
 	};
 
 	return {
+		parameters:		false,
+		oninit:			oninit,
 		onset:			onset,
 		isset:			isset,
 		onget:			onget,
 		onunset:		onunset,
 		oncopy:			oncopy
 	};
-}) ());
+}) (),
+{
+	//--------------------------------------------------------------------------
+	/**
+	 * Description, events, exceptions, example
+	 * @name Interpreter2#test
+	 * @function
+	 * @return true on pass, false on fail
+	 * @type boolean
+	 */
+	test: function () {
+		var _type = Core._("Helpers.Type");
+		var c1 = Core._("Container");
+		var c2 = Core._("Container");
+		var c3 = Core._("Container");
+		var test1, test2, test3, message;
+		var result = true;
+
+		c2.link (c1);
+
+		c1.assign ({ a: 1, b: 2, c: 3, d: 4 });
+		c2.assign ({ b: 5, d: 6, e: 7, f: 8 });
+		c3.assign ({ a: 9, b: 10, g: 11, h: 12 });
+
+		c3.link (c2);
+
+		test1 = "Result: " + c1.get ("a") + c1.get ("b") + c1.get ("c") + 
+			c1.get ("d") + c1.get ("e") + c1.get ("f");
+		test2 = "Result: " + c2.get ("a") + c2.get ("b") + c2.get ("c") + 
+			c2.get ("d") + c2.get ("e") + c2.get ("f");
+		test3 = "Result: " + c3.get ("a") + c3.get ("b") + c3.get ("c") + 
+			c3.get ("d") + c3.get ("e") + c3.get ("f") + c3.get ("g") + 
+			c3.get ("h");
+
+		if (test1 != "Result: 1536undefinedundefined") {
+			if (console && _type.isDefined (console.log)) {
+				console.log ("Regression test #1 failed: " + test1);
+			}
+			result = false;
+		}
+
+		if (test2 != "Result: 153678") {
+			if (console && _type.isDefined (console.log)) {
+				console.log ("Regression test #2 failed: " + test2);
+			}
+			result = false;
+		}
+
+		if (test3 != "Result: 91036781112") {
+			if (console && _type.isDefined (console.log)) {
+				console.log ("Regression test #3 failed: " + test3);
+			}
+			result = false;
+		}
+
+		return result;
+	}
+});
 
 
 

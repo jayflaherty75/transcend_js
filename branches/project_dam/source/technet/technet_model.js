@@ -154,7 +154,7 @@ Core.register ("IteratorAbstract", /** @lends IteratorAbstract */ {
 
 		element = this.onfirst ();
 
-		if (Object.isArray (element)) element = element[0];
+		//if (Object.isArray (element)) element = element[0];
 
 		return element;
 	},
@@ -177,7 +177,7 @@ Core.register ("IteratorAbstract", /** @lends IteratorAbstract */ {
 
 		element = this.onnext ();
 
-		if (Object.isArray (element)) element = element[0];
+		//if (Object.isArray (element)) element = element[0];
 
 		return element;
 	},
@@ -240,17 +240,24 @@ Core.register ("ModelAbstract", /** @lends ModelAbstract */ (function () {
 
 	//Instance methods extend each instance created by the model
 	var _instanceMethods = {
-		getID: function () {
+		/*getID: function () {
 			if (_type.isUndefined (this.id))
 				this.id = Core._("Helpers.Unique")._();
 
 			return this.id;
-		},
+		},*/
 
 		setAttribute: function (name, value) {
-			(this)[name] = value;
+			var self = this;
+
+			try {
+				self[name] = value;
+			}
+			catch (e) {
+			}
 
 			if (name == "src") this.model.load (this);
+			else if (name == "dest") this.model.save (this);
 		},
 
 		getIterator: function () {
@@ -443,28 +450,40 @@ Core.register ("ModelAbstract", /** @lends ModelAbstract */ (function () {
 
 			$H(_instanceMethods).each (function (method) {
 				if (typeof (instance[method.key]) == "undefined") {
-					instance[method.key] = method.value;
+					try {
+						instance[method.key] = method.value;
+					}
+					catch (e) {
+					}
 				}
 				else {
 					//Method already exists in new instance, make multicast
 					//so that both functions get called.
-					mcast = Core._(
-						"Multicast",
-						instance[method.key].bind (instance), 
-						method.value.bind (instance)
-					);
-					instance[method.key] = mcast.call.bind (mcast);
+					try {
+						mcast = Core._(
+							"Multicast",
+							instance[method.key].bind (instance), 
+							method.value.bind (instance)
+						);
+						instance[method.key] = mcast.call.bind (mcast);
+					}
+					catch (e) {
+					}
 				}
 			});
 
-			instance.model = this;
-			if (this.onset) instance.onset = this.onset;
-			if (this.onget) instance.onget = this.onget;
-			if (this.onunset) instance.onunset = this.onunset;
-			if (this.onread) instance.onread = this.onread;
-			if (this.onwrite) instance.onwrite = this.onwrite;
-			if (this.oninsert) instance.oninsert = this.oninsert;
-			if (this.oncompare) instance.oncompare = this.oncompare;
+			try {
+				instance.model = this;
+				if (this.onset) instance.onset = this.onset;
+				if (this.onget) instance.onget = this.onget;
+				if (this.onunset) instance.onunset = this.onunset;
+				if (this.onread) instance.onread = this.onread;
+				if (this.onwrite) instance.onwrite = this.onwrite;
+				if (this.oninsert) instance.oninsert = this.oninsert;
+				if (this.oncompare) instance.oncompare = this.oncompare;
+			}
+			catch (e) {
+			}
 
 			return instance;
 		}
@@ -476,37 +495,27 @@ Core.register ("ModelAbstract", /** @lends ModelAbstract */ (function () {
 	//--------------------------------------------------------------------
 	/**
 	 * Description, exceptions
-	 * @name ModelAbstract#append
+	 * @name ModelAbstract#load
 	 * @function
-	 * @param {object} obj Proxy or instance created by ModelAbstract.getInstance()
-	 * @param {any} data Description
-	 * @return Returns the reference, index or node for the new data
-	 * @type any
+	 * @param {object} obj Instance created by ModelAbstract.getInstance()
 	 */
 	var load = function (obj) {
 		var source = this.source ();
 
-		//Call source with obj as query
-		if (typeof (source) != "undefined") {
-			//Capture server response w/ response type using obj.onload
-			source.load (obj, function (response, success) {
-				var _obj_reup = obj;
-				var type = response["SRC_TYPE"] || "Object";
+		if (_type.isDefined (source)) source.action ("_load", obj);
+	};
 
-				if (success !== false) {
-					//Attempt to instantiate an iterator for response.model
-					delete response["SRC_TYPE"];
-					_obj_reup.convert (Core._ (type + "Iterator", response));
+	//--------------------------------------------------------------------
+	/**
+	 * Description, exceptions
+	 * @name ModelAbstract#save
+	 * @function
+	 * @param {object} obj Instance created by ModelAbstract.getInstance()
+	 */
+	var save = function (obj) {
+		var source = this.source ();
 
-					if (typeof (_obj_reup.onload) == "function")
-						_obj_reup.onload ();
-				}
-				else {
-					if (typeof (_obj_reup.onerror) == "function")
-						_obj_reup.onerror ();
-				}
-			});
-		}
+		if (_type.isDefined (source)) source.action ("_save", obj);
 	};
 
 	//--------------------------------------------------------------------
@@ -518,7 +527,7 @@ Core.register ("ModelAbstract", /** @lends ModelAbstract */ (function () {
 	 */
 	var convert = function (obj, src_iterator) {
 		src_iterator.forEach (function (ref, value) {
-			if (typeof (value) != "function" && !(value instanceof ModelAbstract)) {
+			if (typeof (value) != "function" && !(value instanceof Core.getClass ("ModelAbstract"))) {
 				if (typeof (ref) != "undefined") {
 					obj.set (ref, value);
 				}
@@ -1026,7 +1035,7 @@ Core.extend ("ObjectIterator", "IteratorAbstract", /** @lends HashIterator */ (f
 		var _index = 0;
 		var _keys = new Array (); // = $H(this.data ()).keys ();
 		var _is_value = function (value) {
-			if (typeof (value) != "function" && !(value instanceof ModelAbstract)) {
+			if (typeof (value) != "function" && !(value instanceof Core.getClass ("ModelAbstract"))) {
 				return true;
 			}
 			return false;
@@ -1145,7 +1154,7 @@ Core.extend ("ObjectModel", "ModelAbstract", /** @lends HashModel */ {
 });
 
 //-----------------------------------------------------------------------------
-Core.extend ("ElementIterator", "IteratorAbstract", /** @lends ElementIterator */ (function () {
+Core.extend ("DomIterator", "IteratorAbstract", /** @lends DomIterator */ (function () {
 	var _class_name = "Array";
 
 	/**
@@ -1193,7 +1202,7 @@ Core.extend ("ElementIterator", "IteratorAbstract", /** @lends ElementIterator *
 }) ());
 
 //-----------------------------------------------------------------------------
-Core.extend ("ElementModel", "ModelAbstract", /** @lends ElementModel */ {
+Core.extend ("DomModel", "ModelAbstract", /** @lends DomModel */ {
 	/**
 	 * @class Simple model for handling basic DOM Elements
 	 * @extends ModelAbstract
@@ -1201,7 +1210,7 @@ Core.extend ("ElementModel", "ModelAbstract", /** @lends ElementModel */ {
 	 */
 	oninit: function () {
 		this.className ("Element");
-		this.defaultIterator (Core.getClass ("ElementIterator"));
+		this.defaultIterator (Core.getClass ("DomIterator"));
 	},
 
 	oncreate: function () {
@@ -1214,21 +1223,26 @@ Core.extend ("ElementModel", "ModelAbstract", /** @lends ElementModel */ {
 			object = args[0];
 			break;
 		case "String":
-			object = document.createElement (args[0]);
+			if (args[0] != "text") {
+				object = document.createElement (args[0]);
+			}
+			else {
+				object = document.createTextNode (args[1]);
+			}
 			break;
 		default:
 			object = document.createElement ("div");
 		}
 
-		return object;
+		return $(object);
 	},
 
-	filterReference: function (ref) {
+	/*filterReference: function (ref) {
 		if (typeof (ref) != "number")
 			ref = 0;
 
 		return ref;
-	},
+	},*/
 
 	getFirstRef: function () {
 		return 0;
@@ -1239,11 +1253,13 @@ Core.extend ("ElementModel", "ModelAbstract", /** @lends ElementModel */ {
 	},
 
 	onset: function (ref, value) {
-		this.replaceChild (value, this.childNodes[ref]);
+		//this.replaceChild (value, this.childNodes[ref]);
+		$(this).writeAttribute (ref, value);
 	},
 
 	onget: function (ref) {
-		return this.childNodes[ref];
+		//return this.childNodes[ref];
+		return (this)[ref];
 	},
 
 	onunset: function (ref) {
@@ -1255,12 +1271,19 @@ Core.extend ("ElementModel", "ModelAbstract", /** @lends ElementModel */ {
 	oninsert: function (ref, value) {
 		var nodes = this.childNodes;
 
-		if (ref < 0)
-			ref = 0;
-		else if (ref >= nodes.length)
-			ref = nodes.length;
+		if (ref < 0) ref = 0;
 
-		nodes.splice (ref, 0, value);
+		if (ref >= nodes.length) {
+			this.appendChild (value);
+		}
+		else {
+			if (nodes[ref + 1]) {
+				this.insertBefore (value, nodes[ref + 1]);
+			}
+			else {
+				this.appendChild (value);
+			}
+		}
 	},
 
 	oncompare: function (ref, value) {

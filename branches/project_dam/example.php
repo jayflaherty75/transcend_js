@@ -20,288 +20,64 @@
 	<script type="text/javascript" src="source/technet/technet_interpreter.js"></script>
 	<script type="text/javascript" src="source/technet/technet_interpreter2.js"></script>
 	<script type="text/javascript" src="source/technet/technet_template.js"></script>
+	<script type="text/javascript" src="source/technet/technet_template2.js"></script>
 	<script type="text/javascript" src="source/technet/technet_controller.js"></script>
 	<script type="text/javascript" src="source/technet/technet_model.js"></script>
 	<script type="text/javascript" src="source/technet/technet_view.js"></script>
 	<script type="text/javascript" src="source/technet/technet_process.js"></script>
 	<script type="text/javascript" src="source/technet/technet_client.js"></script>
+	<script type="text/javascript" src="source/technet/technet_source.js"></script>
 	<?php endif; ?>
 	<script type="text/javascript" src="../technet_server/settings.php?action=client_config"></script>
 	<script type="text/javascript">
 		// <![CDATA[
 		window.onload = function () {
-			Core.extend ("DOMContext", "Context2", (function () {
-				var _model = Core._("ElementModel");
+			Core.extend ("TestSource", "SourceController", (function () {
+				var oninit, onload;
+				var _data;
 
-				var _default = function (id, parameters, nodes) {
-					
+				oninit = function () {
+					//_data = new Array (7, 8, 7, 0, 4);
+					//_data._MODEL = "Array";
+					_data = {
+						_MODEL: "Object", 
+						first: 7, second: 8, third: 7, fourth: 0, fifth: 4 
+					};
 				};
 
-				var oninit = function () {
-					this.register ("_default", _default);
-				};
-
-				return {
-					oninit: oninit
-				};
-			}) ());
-
-			Core.extend ("Template2", "Interpreter2", {
-				oninit: function (context) {
-					if (Object.isUndefined (context)) {
-						context = Core._("DOMContext");
-					}
-				}
-
-				/*apply: function (chunk, target) {
-					var context = this.context ();
-					var result = this.run (chunk);
-
-					if (target && Object.isFunction (context.onapply)) 
-						context.onapply.bind (this) (target, result);
-
-					return result;
-				}*/
-			});
-
-			/*
-			Core.register ("ContextAbstract", (function () {
-				var _type = Core._("Helpers.Type");
-				var _commands = {};
-
-				var register = function (name, func) {
-					if (_type.isString (name)) {
-						if (_type.isFunction (func)) {
-							_commands[name] = func;
-						}
-						else
-							throw new TypeError ("ContextAbstract.register(): " +
-								"Parameter 1 must be a string");
-					}
-					else
-						throw new TypeError ("ContextAbstract.register(): " +
-							"Parameter 2 must be a function");
-
-					return this;
-				};
-
-				var start = function (engine, code) {
-					if (_type.isFunction (this.onstart))
-					this.onstart.bind (engine) (code);
-				};
-
-				var scope = function (engine, parent, child) {
-					if (_type.isFunction (this.onscope)) {
-						this.onscope.bind (engine) (parent, child);
-					}
-				};
-
-				var process = function (engine, command, name, id, subroutine) {
-					var handler = _commands[this.command()];
-					var result;
-
-					if (_type.isFunction (handler)) {
-						if (_type.isFunction (this.onprocess))
-							this.onprocess.bind (engine) (command, name, id);
-
-						result = handler.bind (engine) (command, name, id, subroutine);
-					}
-					else {
-						if (_type.isFunction (this.ondefault))
-							result = this.ondefault.bind (engine) (command, name, id, subroutine);
-					}
-
-					if (_type.isFunction (this.onresult))
-						this.onresult.bind (engine) (command, result);
-				};
-
-				var complete = function (engine) {
-					if (_type.isFunction (this.oncomplete))
-						this.oncomplete.bind (engine) ();
-				};
-
-				var onscope = function (parent, child) {
-					//Link child process to global scope which is either
-					//the parent's link or the parent.
-					child.link (parent.link () || parent);
+				onload = function (obj, callback) {
+					callback (_data, true);
 				};
 
 				return {
-					command:		new Core._("Property", "action"),
-					identifier:		new Core._("Property", "id"),
-					nest:			new Core._("Property", "_nodes"),
-					register:		register,
-					start:			start,
-					process:		process,
-					complete:		complete,
-					onscope:		onscope
+					oninit: oninit,
+					onload: onload
 				};
 			}) ());
 
-			//Container and Interpreter should be decoupled.
-			Core.extend ("Interpreter2", "Container", (function () {
-				var _type = Core._("Helpers.Type");
-				var _context = null;
+			Core.extend ("MySource", "SourceController", (function () {
+				var oninit, onload;
+				var _data;
 
-				var initialize = function (context) {
-					_context = context;
-				};
-
-				var get_context = function () {
-					return _context;
-				};
-
-				var execute = function (code) {
-					var iterator = new code.defaultIterator() (code);
-					var _context_reup = _context;
-
-					_context.start (this, code);
-
-					iterator.each (function (ref, command) {
-						var name, id, nest, subroutine;
-
-						command = Model.modelize (command).copy ();
-
-						name = command.unset (this.command());
-						id = command.unset (this.identifier());
-						nest = command.unset (this.nest());
-
-						if (!_type.isUndefined (nest)) {
-							subroutine = Core._("Interpreter2") (_context_reup);
-							_context_reup.scope (this, subroutine);
-						}
-
-						_context.process (this, command, name, id, subroutine);
-					}.bind (this));
-
-					return _context.complete (this);
-				};
-
-				return {
-					initialize:		initialize,
-					getContext:		get_context,
-					execute:		execute,
-					run:			execute		//For backwards compatibility
-				};
-			}) ());
-
-			Core.extend ("DOMContext", "ContextAbstract", (function () {
-				var _type = Core._("Helpers.Type");
-
-				var _process_data = function (id) {
-					var data = this.get (id);
-
-					if (!_type.isUndefined (data)) {
-						if (_type.isArray (data)) {}
-						else if (_type.isFunction (data)) {
-							data = [data ()];
-						}
-						else if (_type.isObject (data)) {
-							Object.extend (args, data);
-							$H(args).each (function (pair) {
-								if (_type.isFunction (pair.value)) {
-									args[pair.key] = pair.value ();
-								}
-							});
-							data = [""];
-						}
-						else data = [data];
-					}
-					else data = [""];
-
-					return data;
-				};
-
-				var initialize = function () {
-					this.command ("action"),
-					this.identifier ("id");
-					this.nest ("_nodes");
-				};
-
-				var ondefault = function (command, name, id, subroutine) {
-					var context = this.getContext ();
-					var data;
-
-					if (!_type.isUndefined (id)) data = this.get (id);
-
-
-
-					var output = new Array ();
-					var data;
-					var count;
-
-					args = $H(args);
-					command = args.unset (cmd_key);
-					childNodes = args.unset (nodes_key);
-					data = context.processData (id, args, this.get ());
-					count = (data.length || 1);
-
-					for (var i = 0; i < count; i++) {
-						var element = new Element (command, args.toObject ());
-						var element_data = data[i];
-
-						if (typeof (childNodes) == "object")
-							context.appendNodes (element, childNodes, this.get (), element_data);
-
-						context.writeData (element, element_data);
-						output.push (element);
-
-						if (id) this.setElement (id, element);
-					}
-
-					return output;
-				};
-
-				var onstart = function (code) {
-				};
-
-				var onresult = function (command, result) {
-				};
-
-				var oncomplete = function () {
-				};
-
-				var cmd_apply_attributes = function (command) {
-				};
-
-				var cmd_apply_style = function (command) {
-				};
-
-				var cmd_text = function (command) {
-				};
-
-				return {
-					initialize:				initialize,
-					ondefault:				ondefault,
-					onstart:				onstart,
-					onresult:				onresult,
-					oncomplete:				oncomplete,
-					cmd_apply_attributes: 	cmd_apply_attributes,
-					cmd_apply_style: 		cmd_apply_style,
-					cmd_text: 				cmd_text
-				};
-			}) ());
-			*/
-
-			Core.extend ("MyController", "Controller", {
-				oninit: function () {
-					var scope = { 
+				oninit = function () {
+					_data = { 
+						_MODEL: "Object", 
 						title: "Tech Net Client", 
 						records: [
-							{ id: "2", value: "100", name: { name: "target1" } },
-							{ id: "4", value: "200", name: { name: "target2" } },
-							{ id: "6", value: "300", name: { name: "target3" } },
-							{ id: "8", value: "400", name: { name: "target4" } },
-							{ id: "10", value: "500", name: { name: "target5" } },
-							{ id: "11", value: "600", name: { name: "target6" } },
-							{ id: "12", value: "700", name: { name: "target7" } },
-							{ id: "13", value: "800", name: { name: "target8" } },
-							{ id: "14", value: "900", name: { name: "target9" } },
-							{ id: "15", value: "1000", name: { name: "target10" } },
-							{ id: "16", value: "1100", name: { name: "target11" } },
-							{ id: "17", value: "1200", name: { name: "target12" } },
-							{ id: "18", value: "1300", name: { name: "target13" } },
-							{ id: "19", value: "1400", name: { name: "target14" } },
+							{ id: "2", value: "100", row_attribs: { name: "target1" } },
+							{ id: "4", value: "200", row_attribs: { name: "target2" } },
+							{ id: "6", value: "300", row_attribs: { name: "target3" } },
+							{ id: "8", value: "400", row_attribs: { name: "target4" } },
+							{ id: "10", value: "500", row_attribs: { name: "target5" } },
+							{ id: "11", value: "600", row_attribs: { name: "target6" } },
+							{ id: "12", value: "700", row_attribs: { name: "target7" } },
+							{ id: "13", value: "800", row_attribs: { name: "target8" } },
+							{ id: "14", value: "900", row_attribs: { name: "target9" } },
+							{ id: "15", value: "1000", row_attribs: { name: "target10" } },
+							{ id: "16", value: "1100", row_attribs: { name: "target11" } },
+							{ id: "17", value: "1200", row_attribs: { name: "target12" } },
+							{ id: "18", value: "1300", row_attribs: { name: "target13" } },
+							{ id: "19", value: "1400", row_attribs: { name: "target14" } },
 						],
 						style: {
 							"border": "1px solid #A0A0A0",
@@ -313,11 +89,29 @@
 							])
 						}
 					};
-					var code = new Array (
+				};
+
+				onload = function (obj, callback) {
+					setTimeout (function () {
+						callback (_data, true);
+						//callback ("Failed to load from MySource: " + obj.src, false);
+					}, 1000);
+				};
+
+				return {
+					oninit: oninit,
+					onload: onload
+				};
+			}) ());
+
+			Core.extend ("MyView", "TemplateView", (function () {
+				var oninit = function () {
+					this.engine().code (new Array (
 						{ action: "div", _nodes: [
 							{ action: "apply-style", id: "style" }, 
 							{ action: "h2", id: "title", "class": "myclass" },
 							{ action: "div", align: "center", id: "output", _nodes: [
+								{ action: "text", content: "MyView Template" },
 								{ action: "br" }
 							]},
 							{ action: "table", _nodes: [
@@ -325,7 +119,7 @@
 									{ action: "tr", id: "records", _nodes: [
 										{ action: "apply-style", id: "attribs" },
 										{ action: "td", id: "id", "width": "128px", _nodes: [
-											{ action: "apply-attributes", id: "name" }
+											{ action: "apply-attributes", id: "row_attribs" }
 										]},
 										{ action: "td", id: "value", "width": "128px" }
 									]}
@@ -333,66 +127,109 @@
 							]},
 							{ action: "br" }
 						]}
-					);
+					));
+				};
 
-					//Interpreter/Template test code
-					var _view = (new TemplateView (code, $("test1"))).assign (scope);
-					var _elements = _view.render ();
-					var bcast_mouseover = new Broadcast ("mouseover", "1px solid black", 
-						_view._("title"), _view._("id"), _view._("value")[7]);
-					var bcast_mouseout = new Broadcast ("mouseout", "0", 
-						_view._("title"), _view._("id"), _view._("value")[7]);
-					var bcast_click = new Broadcast ("click", null, _view._("id"));
+				return {
+					oninit: oninit
+				};
+			}) ());
 
-					this.register ("mouseover", function (event) {
-						Event.getTarget(event).style.border = event.memo;
-					});
-					this.register ("click", function (event) {
-						_view._("output").innerHTML = $(Event.getTarget(event)).readAttribute ("name") + " clicked";
-					});
-					this.register ("test", function (event, arg1, arg2) {
-						alert (event.type + ", " + arg1 + ", " + arg2);
-					});
+			Core.extend ("MyController", "Controller", (function () {
+				var _type = Core._("Helpers.Type");
+				var _mouseover, _mouseout;
+				var oninit, onstartup, render_action, mouseover_action, click_action;
 
-					//Broadcast test code
-					bcast_mouseover.listen (this.getListener ("mouseover"));
-					bcast_mouseout.listen (this.getListener ("mouseover"));
-					bcast_click.listen (this.getListener ("click"));
+				oninit = function () {
+					this.register ("render", render_action);
+					this.register ("mouseover", mouseover_action);
+					this.register ("click", click_action);
+				};
 
-					this.onaction = function () { this.run (); };
+				onstartup = function () {
+					var scope = this.get ("model");
 
-					var view = Raphael ($("test3"), "100%", 200);
-					var circle = (view.circle (160, 100, 99)).attr("fill", "white");
-					//var box = view.rect (10, 10, 1000, 20);
+					if (_type.isDefined (scope)) {
+						//Load data and begin processing actions once completed
+						scope.onload = function () {
+							assert (this.immediateMode (true) == true);
+						}.bind (this);
 
-					circle.node.onmouseover = function () {
-						circle.attr("fill", "#B1BFCF");
-					};
+						scope.onerror = function (response) {
+							alert (response);
+						};
 
-					circle.node.onmouseout = function () {
-						circle.attr("fill", "white");
-					};
+						scope.setAttribute ("src", "http://www.whatever.com/index.php");
 
-					if (Interpreter2.test () === false) alert ("fail!");
-				}
-			});
+						//Set up event casts and listen using actions as listeners
+						if (_type.isUndefined (_mouseover)) {
+							_mouseover = new Eventcast ("mouseover", "1px solid black");
+							_mouseover.listen (this.$mouseover);
+						}
 
-			Core.register ("TestSource", {
-				load: function (obj, callback) {
-					//Usually, queried with "src" and, maybe, other attribs
-					var response = {
-						SRC_TYPE: "Object", first: 1, second: 1, third: 2, fourth: 3, fifth: 2 
-					};
+						if (_type.isUndefined (_mouseout)) {
+							_mouseout = new Eventcast ("mouseout", "0");
+							_mouseout.listen (this.$mouseover);
+						}
 
-					callback (response, true);
-				}
-			});
+						this.event_click = new Eventcast ("click");
+						this.event_click.listen (this.$click);
+					}
+				};
+
+				render_action = function (event, parent) {
+					var scope = this.get ("model");
+					var _view = this.view().assign (scope);
+					var _elements = _view.render (parent);
+
+					_mouseover.add (_view._("title"), _view._("id"), _view._("value")[7]);
+					_mouseout.add (_view._("title"), _view._("id"), _view._("value")[7]);
+					this.event_click.add (_view._("id"));
+				};
+
+				mouseover_action = function (event) {
+					Event.getTarget(event).style.border = event.memo;
+				};
+
+				click_action = function (event) {
+					var view = this.view();
+
+					if (_type.isDefined (view)) 
+						view._("output").innerHTML = 
+						$(Event.getTarget(event)).readAttribute ("name") + " clicked";
+				};
+
+				return {
+					oninit: oninit,
+					onstartup: onstartup
+				};
+			}) ());
 
 			Core.globalize ();
 
+			var source = new MySource ();
+			var model = Model.getInstance (ObjectModel, source);
+			var view = new MyView ();
 			var ctrl = new MyController ();
+			var parent = $("test1");
 
+			ctrl.view (view);
+			ctrl.assign ("model", model);
 			ctrl.run ();
+
+			ctrl.action ("render", parent);
+
+			var source2 = new MySource ();
+			var model2 = Model.getInstance (ObjectModel, source2);
+			var view2 = new MyView ();
+			var ctrl2 = new MyController ();
+			var parent2 = $("testinstance");
+
+			ctrl2.view (view2);
+			ctrl2.assign ("model", model2);
+			ctrl2.run ();
+
+			ctrl2.action ("render", parent2);
 
 			//var mdl_hash = new HashModel ();
 			//var foo = mdl_hash.getInstance ({ 
@@ -413,7 +250,7 @@
 			//foo.onload = function () { alert ("Hello World!"); };
 			//foo.onerror = function () { alert ("Error!"); };
 			foo.setAttribute ("src", "http://www.whatever.com/index.php");
-			i = new ArrayIterator (foo.copy ());
+			i = new (foo.model.defaultIterator()) (foo.copy());
 
 			//Now, some data-agnostic code
 			i.each (function (ref, value) {
@@ -461,15 +298,18 @@
 			$("test3").appendChild (document.createElement ("br"));
 			$("test3").appendChild (document.createElement ("br"));
 
-			console.log ("Testing Template2:");
-			var context_test = Core._("Template2");
+			if (Interpreter2.test () === false) alert ("fail!");
+
+			console.log ("Container test result: ", Container.test ());
 		};
 		// ]]>
 	</script>
 </head>
 
 <body bgcolor="#ffffff">
+	<div id="test0"></div>
 	<div id="test1"></div>
+	<div id="testinstance"></div>
 	<a href="">link</a><br/><br/>
 	<div id="test3"></div>
 </body>
