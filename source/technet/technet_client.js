@@ -170,7 +170,7 @@ Core.extend ("ClientConnection", "Interpreter", /** @lends ClientConnection */ {
 				case "array":
 					var response = new Array ();
 
-					for (i = 0; i < value.arraySize (); i++) {
+					for (var i = 0; i < value.arraySize (); i++) {
 						response.push (response_recurse (value.arrayMem (i)));
 					}
 

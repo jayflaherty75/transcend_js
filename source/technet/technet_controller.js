@@ -11,7 +11,10 @@
 /*---------------------------------------------------------------------------*/
 Core.extend ("Controller", "Interpreter2", /** @lends Controller */ (function () {
 	var _type = Core._("Helpers.Type");
+	var _ref_class = Core.getClass ("Reference");
 	var _handler, _register, _get_listener, _immediate_mode_onchange, oninit;
+	var _initialize, _uninitialize, _batch_start, _batch_end;
+	var create_batch, batch;
 	var _register_simple;
 
 	//-------------------------------------------------------------------------
@@ -21,14 +24,21 @@ Core.extend ("Controller", "Interpreter2", /** @lends Controller */ (function ()
 	 * @param {Context} context Description
 	 */
 	oninit = function (context) {
-		var _actions = new Array ();
+		//var _actions = new Array ();
 		var _run;
 
 		this.view = Core._("Property");
 		this.immediateMode = Core._("Property", false);
 		this.immediateMode.onchange = _immediate_mode_onchange.bind (this);
-
 		this.context (context || Core._("NodeContext"));
+
+		this._actions = new Array ();
+		this._actions_aux = new Array ();
+		this._batch_lock = false;
+
+		this.assign ("_controllers", {});
+		this.assign ("_models", {});
+		this.assign ("_events", {});
 
 		_run = this.run.bind (this);
 
@@ -42,9 +52,24 @@ Core.extend ("Controller", "Interpreter2", /** @lends Controller */ (function ()
 		 * @param {varargs} ... Description
 		 */
 		this.action = function () {
-			var args = $A(arguments);
-			var action_name = args.shift();
-			var action = {
+			var args = new Array ();
+			var action_name = arguments[0];
+			var action;
+			var arg_val;
+
+			if (action_name instanceof _ref_class)
+				action_name = action_name.getValue ();
+
+			for (var i = 1; i < arguments.length; i++) {
+				arg_val = arguments[i];
+
+				if (arg_val instanceof _ref_class)
+					args.push (arg_val.getValue ());
+				else
+					args.push (arg_val);
+			}
+
+			action = {
 				action: action_name,
 				arguments: args
 			};
@@ -53,7 +78,10 @@ Core.extend ("Controller", "Interpreter2", /** @lends Controller */ (function ()
 				args.unshift (window.event || { clientX: 0 });
 			}
 
-			_actions.push (action);
+			if (this._batch_lock)
+				this._actions_aux.push (action);
+			else
+				this._actions.push (action);
 
 			if (_type.isFunction (this.onaction)) 
 				this.onaction (action_name, action);
@@ -68,10 +96,10 @@ Core.extend ("Controller", "Interpreter2", /** @lends Controller */ (function ()
 		 * @type mixed|false
 		 */
 		this.run = function () {
-			var actions = _actions;
+			var actions = this._actions;
 			var result;
 
-			_actions = new Array ();
+			this._actions = new Array ();
 			result = _run (actions);
 
 			return result;
@@ -82,15 +110,64 @@ Core.extend ("Controller", "Interpreter2", /** @lends Controller */ (function ()
 		this.registerSimple = _register_simple;
 		this.getListener = _get_listener;
 
-		this.register ("initialize", function () {
-			if (_type.isFunction (this.onstartup)) return this.onstartup ();
-		});
-
-		this.register ("uninitialize", function () {
-			if (_type.isFunction (this.onshutdown)) return this.onshutdown ();
-		});
+		this.register ("initialize", _initialize);
+		this.register ("uninitialize", _uninitialize);
+		this.register ("batch_start", _batch_start);
+		this.register ("batch_end", _batch_end);
 
 		this.action ("initialize");
+	};
+
+	//-------------------------------------------------------------------------
+	/**
+	 * Description
+	 * @name Controller#$initialize
+	 * @function
+	 */
+	_initialize = function () {
+		if (_type.isFunction (this.onstartup)) return this.onstartup ();
+	};
+
+	//-------------------------------------------------------------------------
+	/**
+	 * Description
+	 * @name Controller#$uninitialize
+	 * @function
+	 */
+	_uninitialize = function () {
+		if (_type.isFunction (this.onshutdown)) return this.onshutdown ();
+	};
+
+	//-------------------------------------------------------------------------
+	/**
+	 * Description
+	 * @name Controller#$batch_start
+	 * @function
+	 */
+	_batch_start = function () {
+		this._batch_lock = true;
+		if (_type.isFunction (this.onbatchstart)) this.onbatchstart ();
+	};
+
+	//-------------------------------------------------------------------------
+	/**
+	 * Description
+	 * @name Controller#$batch_end
+	 * @function
+	 */
+	_batch_end = function () {
+		var action;
+
+		if (_type.isFunction (this.onbatchend)) this.onbatchend ();
+
+		action = this._actions_aux.shift ();
+
+		while (_type.isDefined (action)) {
+			this._actions.push (action);
+			action = this._actions_aux.shift ();
+		}
+
+		this._batch_lock = false;
 	};
 
 	//-------------------------------------------------------------------------
@@ -129,13 +206,8 @@ Core.extend ("Controller", "Interpreter2", /** @lends Controller */ (function ()
 		var self = this;
 		var name = "$" + action_name;
 
-		if (_type.isUndefined (self[name])) {
-			this.registerSimple (action_name, action_handler);
-			//this.context ().register (action_name, function (action, params, nodes) {
-			//	return action_handler.apply (this, params);
-			//}.bind (this));
-			self[name] = this.getListener (action_name);
-		}
+		this.registerSimple (action_name, action_handler);
+		self[name] = this.getListener (action_name);
 	};
 
 	//-------------------------------------------------------------------------
@@ -149,11 +221,9 @@ Core.extend ("Controller", "Interpreter2", /** @lends Controller */ (function ()
 	_register_simple = function (action_name, action_handler) {
 		var self = this;
 
-		if (_type.isUndefined (self[name])) {
-			this.context ().register (action_name, function (action, params, nodes) {
-				return action_handler.apply (this, params);
-			}.bind (this));
-		}
+		this.context ().register (action_name, function (action, params, nodes) {
+			return action_handler.apply (this, params);
+		}.bind (this));
 	};
 
 	//-------------------------------------------------------------------------
@@ -172,6 +242,31 @@ Core.extend ("Controller", "Interpreter2", /** @lends Controller */ (function ()
 			args.unshift (action_name);
 			this.action.apply (this, args);
 		}.bind (this);
+	};
+
+	//-------------------------------------------------------------------------
+	/**
+	 * Description
+	 * @name Controller#createBatch
+	 * @function
+	 */
+	create_batch = function () {
+		return new Array ();
+	};
+
+	//-------------------------------------------------------------------------
+	/**
+	 * Description
+	 * @name Controller#runBatch
+	 * @function
+	 * @param {Array} batch Description
+	 */
+	batch = function (batch) {
+		var result = true;
+
+		do {
+			result = this.run;
+		} while (result);
 	};
 
 	//-------------------------------------------------------------------------
@@ -211,7 +306,9 @@ Core.extend ("Controller", "Interpreter2", /** @lends Controller */ (function ()
 	};
 
 	return {
-		oninit: oninit
+		oninit: oninit,
+		createBatch: create_batch,
+		batch: batch
 	};
 }) ());
 

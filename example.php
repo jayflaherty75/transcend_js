@@ -7,6 +7,7 @@
 	</style>
 
 	<script type="text/javascript" src="source/prototype/prototype.js"></script>
+	<script type="text/javascript" src="source/xmlrpc/xmlrpc_lib.js"></script>
 	<script type="text/javascript" src="source/raphael/raphael-min.js"></script>
 	<?php if (isset ($_REQUEST["action"]) && $_REQUEST["action"] == "test"): ?>
 	<script type="text/javascript" src="source/technet/technet-min.js"></script>
@@ -16,6 +17,7 @@
 	<script type="text/javascript" src="source/technet/technet_helpers.js"></script>
 	<script type="text/javascript" src="source/technet/technet_helper_md5.js"></script>
 	<script type="text/javascript" src="source/technet/technet_container.js"></script>
+	<script type="text/javascript" src="source/technet/technet_reference.js"></script>
 	<script type="text/javascript" src="source/technet/technet_events.js"></script>
 	<script type="text/javascript" src="source/technet/technet_interpreter.js"></script>
 	<script type="text/javascript" src="source/technet/technet_interpreter2.js"></script>
@@ -27,6 +29,7 @@
 	<script type="text/javascript" src="source/technet/technet_process.js"></script>
 	<script type="text/javascript" src="source/technet/technet_client.js"></script>
 	<script type="text/javascript" src="source/technet/technet_source.js"></script>
+	<script type="text/javascript" src="source/technet/technet_source_xmlrpc.js"></script>
 	<?php endif; ?>
 	<script type="text/javascript" src="../technet_server/settings.php?action=client_config"></script>
 	<script type="text/javascript">
@@ -57,12 +60,11 @@
 
 			Core.extend ("MySource", "SourceController", (function () {
 				var oninit, onload;
-				var _data;
 
 				oninit = function () {
-					_data = { 
+					this._data = { 
 						_MODEL: "Object", 
-						title: "Tech Net Client", 
+						title: "TranscendJS", 
 						records: [
 							{ id: "2", value: "100", row_attribs: { name: "target1" } },
 							{ id: "4", value: "200", row_attribs: { name: "target2" } },
@@ -93,9 +95,9 @@
 
 				onload = function (obj, callback) {
 					setTimeout (function () {
-						callback (_data, true);
+						callback (this._data, true);
 						//callback ("Failed to load from MySource: " + obj.src, false);
-					}, 1000);
+					}.bind (this), 1000);
 				};
 
 				return {
@@ -124,9 +126,9 @@
 										{ action: "td", id: "value", "width": "128px" }
 									]}
 								]}
-							]},
-							{ action: "br" }
-						]}
+							]}
+						]},
+						{ action: "br" }
 					));
 				};
 
@@ -137,17 +139,18 @@
 
 			Core.extend ("MyController", "Controller", (function () {
 				var _type = Core._("Helpers.Type");
-				var _mouseover, _mouseout;
 				var oninit, onstartup, render_action, mouseover_action, click_action;
 
 				oninit = function () {
+					//Register all controller actions
 					this.register ("render", render_action);
 					this.register ("mouseover", mouseover_action);
 					this.register ("click", click_action);
 				};
 
 				onstartup = function () {
-					var scope = this.get ("model");
+					var scope = this.get ("_models")["mymodel"];
+					var events = this.get ("_events");
 
 					if (_type.isDefined (scope)) {
 						//Load data and begin processing actions once completed
@@ -161,30 +164,29 @@
 
 						scope.setAttribute ("src", "http://www.whatever.com/index.php");
 
-						//Set up event casts and listen using actions as listeners
-						if (_type.isUndefined (_mouseover)) {
-							_mouseover = new Eventcast ("mouseover", "1px solid black");
-							_mouseover.listen (this.$mouseover);
-						}
+						//Setup events and handlers
+						events["mouseover"] = new Eventcast ("mouseover", "1px solid black");
+						events["mouseover"].listen (this.$mouseover);
 
-						if (_type.isUndefined (_mouseout)) {
-							_mouseout = new Eventcast ("mouseout", "0");
-							_mouseout.listen (this.$mouseover);
-						}
+						events["mouseout"] = new Eventcast ("mouseout", "0");
+						events["mouseout"].listen (this.$mouseover);
 
-						this.event_click = new Eventcast ("click");
-						this.event_click.listen (this.$click);
+						events["click"] = new Eventcast ("click");
+						events["click"].listen (this.$click);
 					}
 				};
 
 				render_action = function (event, parent) {
-					var scope = this.get ("model");
-					var _view = this.view().assign (scope);
-					var _elements = _view.render (parent);
+					//Pass model data to view and render
+					var scope = this.get ("_models")["mymodel"];
+					var events = this.get ("_events");
+					var view = this.view().assign (scope);
+					var elements = view.render (parent);
 
-					_mouseover.add (_view._("title"), _view._("id"), _view._("value")[7]);
-					_mouseout.add (_view._("title"), _view._("id"), _view._("value")[7]);
-					this.event_click.add (_view._("id"));
+					//Add generated view elements to Eventcasts
+					events["mouseover"].add (elements["title"], elements["id"], elements["value"][7]);
+					events["mouseout"].add (elements["title"], elements["id"], elements["value"][7]);
+					events["click"].add (elements["id"]);
 				};
 
 				mouseover_action = function (event) {
@@ -214,7 +216,7 @@
 			var parent = $("test1");
 
 			ctrl.view (view);
-			ctrl.assign ("model", model);
+			ctrl.get ("_models")["mymodel"] = model;
 			ctrl.run ();
 
 			ctrl.action ("render", parent);
@@ -226,7 +228,7 @@
 			var parent2 = $("testinstance");
 
 			ctrl2.view (view2);
-			ctrl2.assign ("model", model2);
+			ctrl2.get ("_models")["mymodel"] = model2;
 			ctrl2.run ();
 
 			ctrl2.action ("render", parent2);
@@ -244,7 +246,8 @@
 			//var i = new HashIterator (foo);
 
 			var source = new TestSource ();
-			var foo = Model.getInstance (ArrayModel, source);
+			//var foo = Model.getInstance (ArrayModel, source);
+			var foo = Core._("Model.ArrayModel", source);
 			var i;
 
 			//foo.onload = function () { alert ("Hello World!"); };
@@ -262,7 +265,8 @@
 			});
 
 			//Now, a demonstration of DOM compatibility
-			var img = Model.getInstance (ImageModel);
+			//var img = Model.getInstance (ImageModel);
+			var img = Core._("Model.ImageModel");
 
 			img.setAttribute ("src", "http://www.jasonkflaherty.com/images/i_can_count.png");
 
@@ -298,9 +302,31 @@
 			$("test3").appendChild (document.createElement ("br"));
 			$("test3").appendChild (document.createElement ("br"));
 
-			if (Interpreter2.test () === false) alert ("fail!");
-
 			console.log ("Container test result: ", Container.test ());
+
+			var rpc_model = new XmlRpcValueModel ();
+			var native_model = new ObjectModel ();
+			var rpc_val = rpc_model.getInstance ({
+				foo: 5,
+				bar: [ 2, 4, 6, 8, "ten", 12 ],
+				baz: "jay",
+				obj: {
+					abc: "def",
+					xyz: 69
+				}
+			});
+			var native_val = native_model.getInstance ();
+			var rpc_iterator = new XmlRpcValueIterator (rpc_val);
+
+			native_val.convert (rpc_iterator);
+
+			console.log (native_val);
+
+			if (Interpreter2.test () === false)
+				alert ("Regression test for Interpreter class failed!");
+
+			if (Reference.test () === false) 
+				alert ("Regression test for Reference class failed!");
 		};
 		// ]]>
 	</script>
@@ -308,8 +334,11 @@
 
 <body bgcolor="#ffffff">
 	<div id="test0"></div>
-	<div id="test1"></div>
-	<div id="testinstance"></div>
+	<table cellspacing="0" cellpadding="0" border="0"><tr valign="top"><td width="280">
+		<div id="test1"></div>
+	</td><td>
+		<div id="testinstance"></div>
+	</td></tr></table>
 	<a href="">link</a><br/><br/>
 	<div id="test3"></div>
 </body>
