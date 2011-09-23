@@ -21,6 +21,8 @@ Core.extend ("SourceController", "Controller", /** @lends SourceController */ (f
 	 * @constructs
 	 */
 	oninit = function () {
+		this.register ("_load", load);
+		this.register ("_save", save);
 		this.assign ("model_key", "_MODEL");
 	};
 
@@ -46,8 +48,6 @@ Core.extend ("SourceController", "Controller", /** @lends SourceController */ (f
 	 * @function
 	 */
 	onstartup = function () {
-		this.register ("_load", load);
-		this.register ("_save", save);
 		this.immediateMode (true);
 	};
 

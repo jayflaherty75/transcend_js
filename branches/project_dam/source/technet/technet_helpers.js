@@ -151,6 +151,10 @@ Core._("Helpers").register ("Type", new (Class.create ({
 	initialize: function () {
 		var _toString = Object.prototype.toString;
 
+		//---------------------------------------------------------------------
+		//Types returned are all capitalized.  Value's classRef() Property, 
+		//model's className(), Number, String, Boolean, Object, Undefined, 
+		//String, Array, Element or NUll.
 		this.getType = function (value) {
 			if (typeof (value.model) == "undefined") {
 				var type = typeof (value);
@@ -159,6 +163,7 @@ Core._("Helpers").register ("Type", new (Class.create ({
 					if (this.isString (value)) return "String";
 					if (this.isArray (value)) return "Array";
 					if (this.isElement (value)) return "Element";
+					if (this.isNull (value)) return "Null";
 				}
 
 				return Core._("Helpers.String").capitalize (type);
@@ -197,6 +202,10 @@ Core._("Helpers").register ("Type", new (Class.create ({
 
 		this.isBoolean = function (object) {
 			return typeof object == "boolean";
+		};
+
+		this.isNull = function (object) {
+			return object == null;
 		};
 
 		this.isUndefined = function (object) {

@@ -15,6 +15,7 @@
 		"technet_config.js", 
 		"technet_helpers.js", 
 		"technet_container.js", 
+		"technet_reference.js", 
 		"technet_events.js", 
 		"technet_interpreter.js", 
 		"technet_interpreter2.js", 

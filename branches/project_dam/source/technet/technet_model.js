@@ -523,6 +523,7 @@ Core.register ("ModelAbstract", /** @lends ModelAbstract */ (function () {
 	 * Description, exceptions
 	 * @name ModelAbstract#convert
 	 * @function
+	 * @param {object} obj Destination object
 	 * @param {Iterator} src_iterator Iterator of source data 
 	 */
 	var convert = function (obj, src_iterator) {
@@ -843,6 +844,10 @@ function () {
 	 * @type Object
 	 */
 	var getInstance = function (model_class, source) {
+		if (_type.isString (model_class)) {
+			model_class = Core.getClass (model_class);
+		}
+
 		if (model = this.getModel (model_class, source)) {
 			return model.getInstance ();
 		}
@@ -878,6 +883,7 @@ function () {
 	};
 
 	return {
+		_: getInstance,
 		getModel: getModel,
 		getInstance: getInstance,
 		modelize: modelize
