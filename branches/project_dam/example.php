@@ -28,6 +28,7 @@
 	<script type="text/javascript" src="source/technet/technet_view.js"></script>
 	<script type="text/javascript" src="source/technet/technet_process.js"></script>
 	<script type="text/javascript" src="source/technet/technet_client.js"></script>
+	<script type="text/javascript" src="source/technet/technet_transport.js"></script>
 	<script type="text/javascript" src="source/technet/technet_source.js"></script>
 	<script type="text/javascript" src="source/technet/technet_source_xmlrpc.js"></script>
 	<?php endif; ?>
@@ -48,8 +49,8 @@
 					};
 				};
 
-				onload = function (obj, callback) {
-					callback (_data, true);
+				onload = function (obj, handler) {
+					handler (_data, true);
 				};
 
 				return {
@@ -93,10 +94,10 @@
 					};
 				};
 
-				onload = function (obj, callback) {
+				onload = function (obj, handler) {
 					setTimeout (function () {
-						callback (this._data, true);
-						//callback ("Failed to load from MySource: " + obj.src, false);
+						handler (this._data, true);
+						//handler ("Failed to load from MySource: " + obj.src, false);
 					}.bind (this), 1000);
 				};
 
@@ -302,8 +303,6 @@
 			$("test3").appendChild (document.createElement ("br"));
 			$("test3").appendChild (document.createElement ("br"));
 
-			console.log ("Container test result: ", Container.test ());
-
 			var rpc_model = new XmlRpcValueModel ();
 			var native_model = new ObjectModel ();
 			var rpc_val = rpc_model.getInstance ({
@@ -322,11 +321,17 @@
 
 			console.log (native_val);
 
+			if (Container.test () === false)
+				alert ("Regression test for Container class failed!");
+
 			if (Interpreter2.test () === false)
 				alert ("Regression test for Interpreter class failed!");
 
 			if (Reference.test () === false) 
 				alert ("Regression test for Reference class failed!");
+
+			if (Controller.test () === false) 
+				alert ("Regression test for Controller class failed!");
 		};
 		// ]]>
 	</script>

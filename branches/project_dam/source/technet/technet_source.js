@@ -98,6 +98,8 @@ Core.extend ("SourceController", "Controller", /** @lends SourceController */ (f
 	 */
 	save = function (event, obj) {
 		if (_type.isFunction (this.onsave)) {
+			if (_type.isUndefined (obj.multi_call)) obj.multi_call = true;
+
 			this.onsave (obj, function (response, success) {
 				var _type_reup = _type;
 
