@@ -410,9 +410,6 @@ Core.extend ("Interpreter2", "Container", /** @lends Interpreter2 */ (function (
 		});
 
 		for (var i = 0; i < tests.length; i++) {
-			if (console && _type.isDefined (console.log))
-				console.log ("Running test " + (i + 1));
-
 			_output = "";
 			interpreter.assign ("message", tests[i]);
 
@@ -422,16 +419,10 @@ Core.extend ("Interpreter2", "Container", /** @lends Interpreter2 */ (function (
 				_output += $A(interpreter.get ("_state").e.trace).inspect ();
 			}
 
-			if (console && _type.isDefined(console.log)) console.log (_output);
-
 			if (_output != results[i]) {
 				if (console && _type.isDefined (console.log)) 
-					console.log ("Failed");
+					console.log ("Interpreter Failed", _output);
 				result = false;
-			}
-			else {
-				if (console && _type.isDefined (console.log)) 
-					console.log ("Passed");
 			}
 		}
 

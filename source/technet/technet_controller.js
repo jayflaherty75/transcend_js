@@ -33,8 +33,6 @@ Core.extend ("Controller", "Interpreter2", /** @lends Controller */ (function ()
 		this.context (context || Core._("NodeContext"));
 
 		this._actions = new Array ();
-		this._actions_aux = new Array ();
-		this._batch_lock = false;
 
 		this.assign ("_controllers", {});
 		this.assign ("_models", {});
@@ -52,39 +50,48 @@ Core.extend ("Controller", "Interpreter2", /** @lends Controller */ (function ()
 		 * @param {varargs} ... Description
 		 */
 		this.action = function () {
-			var args = new Array ();
-			var action_name = arguments[0];
-			var action;
-			var arg_val;
+			if (_type.isArray (arguments[0])) {
+				var batch = arguments[0];
+				var i, args;
 
-			if (action_name instanceof _ref_class)
-				action_name = action_name.getValue ();
-
-			for (var i = 1; i < arguments.length; i++) {
-				arg_val = arguments[i];
-
-				if (arg_val instanceof _ref_class)
-					args.push (arg_val.getValue ());
-				else
-					args.push (arg_val);
+				for (i = 0, args=batch[0]; i < batch.length; args=batch[++i]) {
+					if (_type.isArray (args)) {
+						this.action.apply (this, args);
+					}
+				}
 			}
+			else {
+				var args = new Array ();
+				var action_name = arguments[0];
+				var action;
+				var arg_val;
 
-			action = {
-				action: action_name,
-				arguments: args
-			};
+				if (action_name instanceof _ref_class)
+					action_name = action_name.getValue ();
 
-			if (!Event.isEvent (args[0])) {
-				args.unshift (window.event || { clientX: 0 });
-			}
+				for (var i = 1; i < arguments.length; i++) {
+					arg_val = arguments[i];
 
-			if (this._batch_lock)
-				this._actions_aux.push (action);
-			else
+					if (arg_val instanceof _ref_class)
+						args.push (arg_val.getValue ());
+					else
+						args.push (arg_val);
+				}
+
+				action = {
+					action: action_name,
+					arguments: args
+				};
+
+				if (!Event.isEvent (args[0])) {
+					args.unshift (window.event || { clientX: 0 });
+				}
+
 				this._actions.push (action);
 
-			if (_type.isFunction (this.onaction)) 
-				this.onaction (action_name, action);
+				if (_type.isFunction (this.onaction)) 
+					this.onaction (action_name, action);
+			}
 		};
 
 		//---------------------------------------------------------------------
@@ -145,7 +152,6 @@ Core.extend ("Controller", "Interpreter2", /** @lends Controller */ (function ()
 	 * @function
 	 */
 	_batch_start = function () {
-		this._batch_lock = true;
 		if (_type.isFunction (this.onbatchstart)) this.onbatchstart ();
 	};
 
@@ -156,18 +162,7 @@ Core.extend ("Controller", "Interpreter2", /** @lends Controller */ (function ()
 	 * @function
 	 */
 	_batch_end = function () {
-		var action;
-
 		if (_type.isFunction (this.onbatchend)) this.onbatchend ();
-
-		action = this._actions_aux.shift ();
-
-		while (_type.isDefined (action)) {
-			this._actions.push (action);
-			action = this._actions_aux.shift ();
-		}
-
-		this._batch_lock = false;
 	};
 
 	//-------------------------------------------------------------------------
@@ -247,31 +242,6 @@ Core.extend ("Controller", "Interpreter2", /** @lends Controller */ (function ()
 	//-------------------------------------------------------------------------
 	/**
 	 * Description
-	 * @name Controller#createBatch
-	 * @function
-	 */
-	create_batch = function () {
-		return new Array ();
-	};
-
-	//-------------------------------------------------------------------------
-	/**
-	 * Description
-	 * @name Controller#runBatch
-	 * @function
-	 * @param {Array} batch Description
-	 */
-	batch = function (batch) {
-		var result = true;
-
-		do {
-			result = this.run;
-		} while (result);
-	};
-
-	//-------------------------------------------------------------------------
-	/**
-	 * Description
 	 * @name Controller#immediateMode
 	 * @function
 	 * @param {boolean} mode Description
@@ -310,7 +280,162 @@ Core.extend ("Controller", "Interpreter2", /** @lends Controller */ (function ()
 		createBatch: create_batch,
 		batch: batch
 	};
-}) ());
+}) (), {
+	test: function () {
+		var _output = "";
+		var batch_ctrl = Core._ ("Controller");
 
+		batch_ctrl.register ("test1", function (event, arg1, arg2) {
+			_output += "test1 " + arg1 + " " + arg2 + " ";
+		});
+		batch_ctrl.register ("test2", function (event, arg1, arg2) {
+			_output += "test2 " + arg1 + " " + arg2 + " ";
+		});
+		batch_ctrl.register ("test3", function (event, arg1, arg2) {
+			_output += "test3 " + arg1 + " " + arg2 + " ";
+		});
+		batch_ctrl.onstartup = function () {
+			this.immediateMode (true);
+		};
+		batch_ctrl.onbatchstart = function () {
+			_output += "Batch starting ";
+		};
+		batch_ctrl.onbatchend = function () {
+			_output += "Batch ended";
+		};
+
+		var batch = Core._("ControllerBatch", batch_ctrl, "arg1", "arg2");
+		var batch_func = batch.getFunction ();
+		var batch_data = {
+			this_value: 100,
+			that_value: 200
+		};
+
+		batch_ctrl.run ();
+
+		batch.action ("test1", 1, Core._("Reference", batch_data, "this_value"));
+		batch.action ("test2", Core._("Reference", batch, "get", "arg1"), Core._("Reference", batch, "get", "arg2"));
+		batch.action ("test3", 5, Core._("Reference", batch_data, "that_value"));
+
+		//batch.assign ({ arg1: 37, arg2: "Jason Flaherty" });
+		//batch.run ();
+
+		batch_func (37, "Jason Flaherty");
+
+		if (_output == "Batch starting test1 1 100 test2 37 Jason Flaherty test3 5 200 Batch ended")
+			return true;
+
+		return false;
+	}
+});
+
+/*---------------------------------------------------------------------------*/
+Core.extend ("ControllerBatch", "Container", /** @lends ControllerBatch */ (function () {
+	var _type = Core._("Helpers.Type");
+	var _ref_class = Core.getClass ("Reference");
+	var oninit, action, run, map, get_function;
+	var _default_value = false;
+
+	//-------------------------------------------------------------------------
+	/**
+	 * @class ControllerBatch handles automated controller actions
+	 * @constructs
+	 * @param {Controller} controller Description
+	 */
+	oninit = function (controller) {
+		this._controller = Core._ ("Property", controller);
+		this._mappings = _default_value;
+		this._actions = new Array (new Array ("batch_start"));
+		this._is_closed = false;
+
+		for (var i = 1; i < arguments.length; i++) {
+			this.map (arguments[i]);
+		}
+	};
+
+	//-------------------------------------------------------------------------
+	/**
+	 * Description
+	 * @name ControllerBatch#action
+	 * @function
+	 * @param {mixed} ... Description
+	 * @return Description
+	 * @type ControllerBatch
+	 */
+	action = function () {
+		var action_name = arguments[0];
+
+		if (!this._is_closed) {
+			if (_type.isString (action_name) || action_name instanceof _ref_class)
+				this._actions.push ($A(arguments));
+		}
+
+		return this;
+	};
+
+	//-------------------------------------------------------------------------
+	/**
+	 * Description
+	 * @name ControllerBatch#run
+	 * @function
+	 */
+	run = function (controller) {
+		controller = controller || this._controller ();
+
+		if (!this._is_closed) {
+			this._actions.push (new Array ("batch_end"));
+			this._is_closed = true;
+		}
+
+		if (controller) controller.action (this._actions);
+	};
+
+	//-------------------------------------------------------------------------
+	/**
+	 * Description
+	 * @name ControllerBatch#map
+	 * @function
+	 * @param {String} arg_name Description
+	 * @return Description
+	 * @type ControllerBatch
+	 */
+	map = function (arg_name) {
+		if (_type.isString (arg_name)) {
+			if (this._mappings === false)
+				this._mappings = new Array ();
+
+			this._mappings.push (arg_name);
+		}
+
+		return this;
+	};
+
+	//-------------------------------------------------------------------------
+	/**
+	 * Description
+	 * @name ControllerBatch#getFunction
+	 * @function
+	 * @param {mixed} ... Description
+	 * @return Description
+	 * @type Function
+	 */
+	get_function = function (controller) {
+		return function () {
+			for (var i = 0; i < this._mappings.length; i++) {
+				this.assign (this._mappings[i], arguments[i]);
+			}
+
+			this.run (controller);
+		}.bind (this);
+	};
+
+	return {
+		oninit: oninit,
+		action: action,
+		run: run,
+		map: map,
+		getFunction: get_function
+	};
+}) ());
 
 
