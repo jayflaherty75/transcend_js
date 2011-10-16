@@ -190,6 +190,8 @@ Core = new (Class.create ( /** @lends Core# */ {
 
 		//--------------------------------------------------------------------
 		/**
+		 * DEPRECATED.  Use Events core branch instead.<br/><br/>
+		 * 
 		 * Registers an event, allowing it to be accessed from the global
 		 * environment.  The <i>namespace</i> parameter allows for events to 
 		 * be grouped into categories to help avoid naming collisions.  The
@@ -204,14 +206,12 @@ Core = new (Class.create ( /** @lends Core# */ {
 		 * @param {Eventcast} bcast Eventcast to be registered
 		 */
 		this.event = function (namespace, name, bcast) {
-			var events;
+			var events = _events[namespace];
 
-			if (Object.isUndefined (_events[namespace])) {
+			if (Object.isUndefined (events)) {
 				events = {};
 				_events[namespace] = events;
 			}
-			else
-				events = _events[namespace];
 
 			if (bcast) {
 				name = name + "_" + bcast.getType ();
@@ -270,6 +270,18 @@ Core = new (Class.create ( /** @lends Core# */ {
 					this.globalize (pairs.key, overwrite);
 				}.bind (this));
 			}
+		};
+
+		//--------------------------------------------------------------------
+		/**
+		 * Uses "$" instead of Core for those that prefer a 
+		 * Prototype-/jQuery-style shortcut.
+		 * @name Core#dollarize
+		 * @function
+		 */
+		this.dollarize = function () {
+			window["$"] = window["Core"];
+			delete window["Core"];
 		};
 
 		//--------------------------------------------------------------------
@@ -351,7 +363,7 @@ Core = new (Class.create ( /** @lends Core# */ {
 		 * @type String
 		 */
 		this.getID = function (object) {
-			if (typeof (object) != "undefined") {
+			if (typeof (object) != "undefined" && object != null) {
 				if (typeof (object._uid) == "undefined") {
 					return this.setID (object);
 				}
@@ -486,7 +498,8 @@ Core = new (Class.create ( /** @lends Core# */ {
 			isEvent: function (evt) {
 				if (evt == null) return false;
 				if (typeof (evt) != "object") return false; 
-				if (Object.isUndefined (evt.clientX)) return false;
+				if (Object.isUndefined (evt.clientX) &&
+					Object.isUndefined (evt.defaultPrevented)) return false;
 
 				return true;
 			}
@@ -551,9 +564,6 @@ Core.register ("CoreBranch", /** @lends CoreBranch */ {
 });
 
 //-----------------------------------------------------------------------------
-Core.singleton ("Helpers", /** @lends Helpers */ Core._("CoreBranch"));
-
-//-----------------------------------------------------------------------------
 Core.extend ("ExceptionBranch", "CoreBranch", /** @lends ExceptionBranch */ {
 	/**
 	 * @class Extends CoreBranch to create a storage hierarchy for exceptions.
@@ -590,6 +600,12 @@ Core.extend ("ExceptionBranch", "CoreBranch", /** @lends ExceptionBranch */ {
 		this._ = this.getValue;
 	}
 });
+
+//-----------------------------------------------------------------------------
+Core.singleton ("Helpers", /** @lends Helpers */ Core._("CoreBranch"));
+
+//-----------------------------------------------------------------------------
+Core.singleton ("Events", /** @lends Events */ Core._("CoreBranch"));
 
 //-----------------------------------------------------------------------------
 Core.singleton ("Exceptions", /** @lends Exceptions */ Core._("ExceptionBranch"));
@@ -673,17 +689,6 @@ Core.register ("Property", /** @lends Property# */ function () {
 	};
 
 	return func;
-});
-
-//-----------------------------------------------------------------------------
-Core.register ("Constant",  /** @lends Constant# */ function () {
-	/**
-	 * @class Works similarly to {@link Property} except that the value can 
-	 * 	never be changed.
-	 */
-	var _value = arguments[0];
-
-	return function () { return _value; };
 });
 
 //-----------------------------------------------------------------------------

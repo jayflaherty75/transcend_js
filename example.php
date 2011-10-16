@@ -1,6 +1,6 @@
 <html>
 <head>
-	<title>Tech Net Client - Example Usage</title>
+	<title>TranscendJS - Example Usage</title>
 
 	<style type="text/css">
 		.myclass { color: red; text-align: center; }
@@ -28,7 +28,6 @@
 	<script type="text/javascript" src="source/technet/technet_view.js"></script>
 	<script type="text/javascript" src="source/technet/technet_process.js"></script>
 	<script type="text/javascript" src="source/technet/technet_client.js"></script>
-	<script type="text/javascript" src="source/technet/technet_transport.js"></script>
 	<script type="text/javascript" src="source/technet/technet_source.js"></script>
 	<script type="text/javascript" src="source/technet/technet_source_xmlrpc.js"></script>
 	<?php endif; ?>
@@ -303,6 +302,34 @@
 			$("test3").appendChild (document.createElement ("br"));
 			$("test3").appendChild (document.createElement ("br"));
 
+			var rpc_xport = (new XmlRpcController ()).assign ({
+				server: "http://intranet.jasonkflaherty.com/clients/technet_server/",
+				debug: true
+			});
+			var rpc_process = (new Process ("XmlRpcTransport", rpc_xport.run.bind (rpc_xport), 0.5)).start ();
+			var rpc_client = new XmlRpcClient ();
+			var rpc_source = new XmlRpcSource ();
+			var rpc_model = new ArrayModel (rpc_source);
+			var test_obj = rpc_model.getInstance ();
+
+			test_obj.onload = function (response) {
+				console.log ("Final output:", Object.toJSON (response));
+
+				//test_obj.setAttribute ("dest", "testfile.json");
+			};
+
+			rpc_xport.run ();
+			rpc_source.assign ("target", rpc_client);
+			rpc_client.get ("_controllers")["primary"] = rpc_xport;
+			rpc_client.run ();
+
+			test_obj.setAttribute ("src", {
+				dir: "/data/analytics",
+				file: "7f0000017db80e0b202d2d904f20095.json"
+				//file: "63f7300a7db9020a1414353951b005f.json"
+			});
+
+			/*
 			var rpc_model = new XmlRpcValueModel ();
 			var native_model = new ObjectModel ();
 			var rpc_val = rpc_model.getInstance ({
@@ -320,6 +347,7 @@
 			native_val.convert (rpc_iterator);
 
 			console.log (native_val);
+			*/
 
 			if (Container.test () === false)
 				alert ("Regression test for Container class failed!");

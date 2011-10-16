@@ -24,9 +24,8 @@
 		"technet_process.js",
 		"technet_controller.js",
 		"technet_model.js",
-		"technet_view.js",
-		"technet_transport.js"
-		);
+		"technet_view.js"
+	);
 	$exec_docs = "java -jar \"" . $settings["jsdoc"] . "\" \"" . 
 		$settings["jsdocrun"] . "\" -a -t=\"" . $settings["templates"] . 
 		"\" -d=\"" . $settings["docs"] . "\" \"" . $settings["scripts"] . "\"";

@@ -17,9 +17,11 @@ Core.extend ("TransportController", "Controller", /** @lends ConnectionControlle
 	/**
 	 * @class Description
 	 * @constructs
-	 * @param {ServerController} server Description
 	 */
-	oninit = function (settings, debug) {
+	oninit = function () {
+		this.timeout = Core._("Property", 30);
+		this.debug = Core._("Property");
+
 		this.register ("send", send_action);
 	};
 
@@ -33,8 +35,9 @@ Core.extend ("TransportController", "Controller", /** @lends ConnectionControlle
 	 * @param {Function} handler Description
 	 */
 	send_action = function (event, message, handler) {
-		if (_type.isFunction (this.onsend))
-			this.onsend (message);
+		if (_type.isFunction (this.onsend)) {
+			this.onsend (message, handler);
+		}
 	};
 
 	return {
@@ -44,6 +47,7 @@ Core.extend ("TransportController", "Controller", /** @lends ConnectionControlle
 
 //-----------------------------------------------------------------------------
 Core.extend ("ClientController", "Controller", /** @lends ServerController */ (function () {
+	var _type = Core._("Helpers.Type");
 	var oninit, onstartup;
 	var send_action, success_action, error_action;
 
@@ -93,8 +97,9 @@ Core.extend ("ClientController", "Controller", /** @lends ServerController */ (f
 	 * @param {mixed} response Description
 	 * @param {Function} handler Description
 	 */
-	success_action = function (event, response, handler) {
-		handler (response, true);
+	success_action = function (event, response) {
+		if (_type.isFunction (this.onresponse))
+			this.onresponse (response, true);
 	};
 
 	//-------------------------------------------------------------------------
@@ -106,8 +111,9 @@ Core.extend ("ClientController", "Controller", /** @lends ServerController */ (f
 	 * @param {mixed} response Description
 	 * @param {Function} handler Description
 	 */
-	error_action = function (event, response, handler) {
-		handler (response, false);
+	error_action = function (event, response) {
+		if (_type.isFunction (this.onresponse))
+			this.onresponse (response, false);
 	};
 
 	return {

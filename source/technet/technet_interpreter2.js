@@ -119,10 +119,15 @@ Core.register ("Context2", /** @lends Context2 */ (function () {
 	 * @type type
 	 */
 	var execute = function (interpreter, id, parameters, nodes) {
-		var rule = this.rules[id] || this.rules["_default"], result = false;
+		var rule = this.rules[id], result = false;
 		var _type_reup = _type;
 
-		if (_type.isDefined (rule)) {
+		if (!_type.isFunction (rule)) {
+			rule = this.rules["_default"];
+			if (Event.isEvent (parameters[0])) parameters[0] = id;
+		}
+
+		if (_type.isFunction (rule)) {
 			result = rule.bind (interpreter) (id, parameters, nodes);
 
 			if (!result) {
@@ -156,7 +161,7 @@ Core.register ("Context2", /** @lends Context2 */ (function () {
 
 				state.e.trace.push (trace);
 			}
-		};
+		}
 
 		return result;
 	};
