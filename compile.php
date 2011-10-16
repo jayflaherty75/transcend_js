@@ -1,27 +1,61 @@
 <?php
 	$output = "";
 	$settings = array (
-		"libfile" => "\\xampp\\htdocs\\clients\\technet_client\\source\\technet\\technet.js",
-		"outfile" => "\\xampp\\htdocs\\clients\\technet_client\\source\\technet\\technet-min.js",
+		"libfile" => "\\xampp\\htdocs\\clients\\technet_client\\source\\transcendjs\\transcend.js",
+		"outfile" => "\\xampp\\htdocs\\clients\\technet_client\\source\\transcendjs\\transcend-min.js",
 		"jsdoc" => "\\Program Files\\JSDoc\\jsrun.jar",
 		"jsdocrun" => "\\Program Files\\JSDoc\\app\\run.js",
 		"templates" => "\\Program Files\\JSDoc\\templates\\jsdoc",
-		"scripts" => "\\xampp\\htdocs\\clients\\technet_client\\source\\technet",
+		"scripts" => "\\xampp\\htdocs\\clients\\technet_client\\source\\transcendjs",
 		"docs" => "\\xampp\\htdocs\\clients\\technet_client\\docs",
 		"compressor" => "\\Program Files\\yuicompressor\\build\\yuicompressor-2.4.2.jar"
 	);
 	$files = array (
-		"technet_core.js", 
-		"technet_config.js", 
-		"technet_helpers.js", 
-		"technet_container.js", 
-		"technet_events.js", 
-		"technet_interpreter.js", 
-		"technet_process.js",
-		"technet_controller.js",
-		"technet_model.js",
-		"technet_template.js",
-		"technet_view.js"
+		"transcend.core.js",
+		"transcend.exception.js",
+		"transcend.property.js",
+		"transcend.config.js",
+		"transcend.helper.cookies.js",
+		"transcend.helper.querystring.js",
+		"transcend.helper.css.js",
+		"transcend.helper.unique.js",
+		"transcend.helper.type.js",
+		"transcend.helper.string.js",
+		"transcend.container.abstract.js",
+		"transcend.container.js",
+		"transcend.reference.js",
+		"transcend.multicast.js",
+		"transcend.eventcast.js",
+		"transcend.context.js",
+		"transcend.context.node.js",
+		"transcend.interpreter.js",
+		"transcend.template.js",
+		"transcend.process.js",
+		"transcend.controller.js",
+		"transcend.batch.js",
+		"transcend.iterator.abstract.js",
+		"transcend.iterator.array.js",
+		"transcend.iterator.object.js",
+		"transcend.iterator.dom.js",
+		"transcend.model.abstract.js",
+		"transcend.model.js",
+		"transcend.model.array.js",
+		"transcend.model.object.js",
+		"transcend.model.dom.js",
+		"transcend.model.image.js",
+		"transcend.view.js",
+		"transcend.view.helper.js",
+		"transcend.view.template.js",
+		"transcend.source.js",
+		"transcend.transport.js",
+		"transcend.client.js",
+		"transcend.xmlrpc.helper.js",
+		"transcend.xmlrpc.iterator.js",
+		"transcend.xmlrpc.iterator.value.js",
+		"transcend.xmlrpc.model.value.js",
+		"transcend.xmlrpc.model.message.js",
+		"transcend.xmlrpc.transport.js",
+		"transcend.xmlrpc.client.js",
 	);
 	$exec_docs = "java -jar \"" . $settings["jsdoc"] . "\" \"" . 
 		$settings["jsdocrun"] . "\" -a -t=\"" . $settings["templates"] . 
@@ -46,7 +80,7 @@
 		echo ($settings["outfile"] . " not found.");
 	}
 
-	echo ("<pre>Exporting documentation...\r\n\r\n");
+		echo ("<pre>Exporting documentation...\r\n\r\n");
 	echo ($exec_docs . "\r\n\r\n");
 
 	system ($exec_docs);
