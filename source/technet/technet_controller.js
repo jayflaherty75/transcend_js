@@ -304,7 +304,7 @@ Core.extend ("Controller", "Interpreter", /** @lends Controller */ (function () 
 			_output += "Batch ended";
 		};
 
-		var batch = Core._("ControllerBatch", batch_ctrl, "arg1", "arg2");
+		var batch = Core._("Batch", batch_ctrl, "arg1", "arg2");
 		var batch_func = batch.getFunction ();
 		var batch_data = {
 			this_value: 100,
@@ -330,7 +330,7 @@ Core.extend ("Controller", "Interpreter", /** @lends Controller */ (function () 
 });
 
 /*---------------------------------------------------------------------------*/
-Core.extend ("ControllerBatch", "Container", /** @lends ControllerBatch */ (function () {
+Core.extend ("Batch", "Container", /** @lends Batch */ (function () {
 	var _type = Core._("Helpers.Type");
 	var _ref_class = Core.getClass ("Reference");
 	var oninit, action, run, map, get_function;
@@ -338,7 +338,7 @@ Core.extend ("ControllerBatch", "Container", /** @lends ControllerBatch */ (func
 
 	//-------------------------------------------------------------------------
 	/**
-	 * @class ControllerBatch handles automated controller actions
+	 * @class Batch handles automated controller actions
 	 * @constructs
 	 * @param {Controller} controller Description
 	 */
@@ -356,11 +356,11 @@ Core.extend ("ControllerBatch", "Container", /** @lends ControllerBatch */ (func
 	//-------------------------------------------------------------------------
 	/**
 	 * Description
-	 * @name ControllerBatch#action
+	 * @name Batch#action
 	 * @function
 	 * @param {mixed} ... Description
 	 * @return Description
-	 * @type ControllerBatch
+	 * @type Batch
 	 */
 	action = function () {
 		var action_name = arguments[0];
@@ -376,7 +376,7 @@ Core.extend ("ControllerBatch", "Container", /** @lends ControllerBatch */ (func
 	//-------------------------------------------------------------------------
 	/**
 	 * Description
-	 * @name ControllerBatch#run
+	 * @name Batch#run
 	 * @function
 	 */
 	run = function (controller) {
@@ -393,11 +393,11 @@ Core.extend ("ControllerBatch", "Container", /** @lends ControllerBatch */ (func
 	//-------------------------------------------------------------------------
 	/**
 	 * Description
-	 * @name ControllerBatch#map
+	 * @name Batch#map
 	 * @function
 	 * @param {String} arg_name Description
 	 * @return Description
-	 * @type ControllerBatch
+	 * @type Batch
 	 */
 	map = function (arg_name) {
 		if (_type.isString (arg_name)) {
@@ -413,7 +413,7 @@ Core.extend ("ControllerBatch", "Container", /** @lends ControllerBatch */ (func
 	//-------------------------------------------------------------------------
 	/**
 	 * Description
-	 * @name ControllerBatch#getFunction
+	 * @name Batch#getFunction
 	 * @function
 	 * @param {mixed} ... Description
 	 * @return Description
