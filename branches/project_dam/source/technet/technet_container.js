@@ -319,7 +319,7 @@ function () {
 	//--------------------------------------------------------------------------
 	/**
 	 * Description, events, exceptions, example
-	 * @name Interpreter2#test
+	 * @name Container#test
 	 * @function
 	 * @return true on pass, false on fail
 	 * @type boolean

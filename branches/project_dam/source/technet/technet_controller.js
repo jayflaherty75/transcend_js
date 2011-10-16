@@ -9,7 +9,7 @@
  */
 
 /*---------------------------------------------------------------------------*/
-Core.extend ("Controller", "Interpreter2", /** @lends Controller */ (function () {
+Core.extend ("Controller", "Interpreter", /** @lends Controller */ (function () {
 	var _type = Core._("Helpers.Type");
 	var _ref_class = Core.getClass ("Reference");
 	var _handler, _register, _get_listener, _immediate_mode_onchange, oninit;

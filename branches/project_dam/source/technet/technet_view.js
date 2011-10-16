@@ -84,7 +84,7 @@ Core.extend ("TemplateView", "View", /** @lends TemplateView# */ (function () {
 	var oninit = function (template, _parent, context) {
 		var _context = Core._("NodeContext");
 		var _model = Core._("DomModel");
-		var _engine = Core._("Template2", _context);
+		var _engine = Core._("Template", _context);
 
 		_engine.model (_model);
 
