@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 /**
- * @fileoverview Description, required classes, examples
+ * @fileoverview Description, required classes, examples<br/><br/>
  * 
  * 	Copyright	&copy; 2011 {@link http://www.jasonkflaherty.com Jason K. Flaherty}<br />
  * @author		{@link http://www.jasonkflaherty.com Jason K. Flaherty}
