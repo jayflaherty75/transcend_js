@@ -237,6 +237,20 @@ Core.extend ("Eventcast", "Multicast", /** @lends Eventcast# */ {
 
 		//--------------------------------------------------------------------
 		/**
+		 * Sets the memo to be passed along with events.
+		 * @name Eventcast#setMemo
+		 * @function
+		 * @param {mixed} Any data to be passed along with the event.
+		 * @return Returns "this" instance for use in chain calls.
+		 * @type Eventcast
+		 */
+		var setMemo = function (new_memo) {
+			memo = new_memo;
+			return this;
+		};
+
+		//--------------------------------------------------------------------
+		/**
 		 * Handler function to be assigned to object's hook-in.  This calls
 		 * <i>Multicast.call()</i> method along with event parameters sent
 		 * by target object.

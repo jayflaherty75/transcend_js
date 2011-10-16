@@ -202,7 +202,7 @@ Core.extend ("Controller", "Interpreter2", /** @lends Controller */ (function ()
 		var name = "$" + action_name;
 
 		this.registerSimple (action_name, action_handler);
-		self[name] = this.getListener (action_name);
+		self[name.replace (/[\.]/g, "_")] = this.getListener (action_name);
 	};
 
 	//-------------------------------------------------------------------------
@@ -218,7 +218,7 @@ Core.extend ("Controller", "Interpreter2", /** @lends Controller */ (function ()
 
 		this.context ().register (action_name, function (action, params, nodes) {
 			return action_handler.apply (this, params);
-		}.bind (this));
+		});
 	};
 
 	//-------------------------------------------------------------------------

@@ -9,21 +9,20 @@
 
 //-----------------------------------------------------------------------------
 Core.extend ("SourceController", "Controller", /** @lends SourceController */ (function () {
-	/**
-	 * @class Description
-	 */
 	var oninit, onpostinit, onstartup, load, save;
 	var _default_type = "Object";
 	var _type = Core._("Helpers.Type");
 
 	//-------------------------------------------------------------------------
 	/**
+	 * @class Description
+	 * @extends Controller
 	 * @constructs
 	 */
 	oninit = function () {
 		this.register ("_load", load);
 		this.register ("_save", save);
-		this.assign ("model_key", "_MODEL");
+		this.assign ({ target: null, "model_key": "_MODEL" });
 	};
 
 	//-------------------------------------------------------------------------

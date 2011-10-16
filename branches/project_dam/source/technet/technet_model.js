@@ -781,6 +781,7 @@ Core.register ("ModelAbstract", /** @lends ModelAbstract */ (function () {
 		initialize:			initialize,
 		getInstance:		get_instance,
 		load:				load,
+		save:				save,
 		convert:			convert,
 		set:				set,
 		get:				get,
@@ -843,13 +844,17 @@ function () {
 	 * @return Description
 	 * @type Object
 	 */
-	var getInstance = function (model_class, source) {
+	var getInstance = function () {
+		var args = $A(arguments);
+		var model_class = args.shift ();
+		var source = args.shift ();
+
 		if (_type.isString (model_class)) {
 			model_class = Core.getClass (model_class);
 		}
 
 		if (model = this.getModel (model_class, source)) {
-			return model.getInstance ();
+			return model.getInstance.apply (model, args);
 		}
 
 		return null;
