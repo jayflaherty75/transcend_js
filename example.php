@@ -20,9 +20,7 @@
 	<script type="text/javascript" src="source/technet/technet_reference.js"></script>
 	<script type="text/javascript" src="source/technet/technet_events.js"></script>
 	<script type="text/javascript" src="source/technet/technet_interpreter.js"></script>
-	<script type="text/javascript" src="source/technet/technet_interpreter2.js"></script>
 	<script type="text/javascript" src="source/technet/technet_template.js"></script>
-	<script type="text/javascript" src="source/technet/technet_template2.js"></script>
 	<script type="text/javascript" src="source/technet/technet_controller.js"></script>
 	<script type="text/javascript" src="source/technet/technet_model.js"></script>
 	<script type="text/javascript" src="source/technet/technet_view.js"></script>
@@ -352,7 +350,7 @@
 			if (Container.test () === false)
 				alert ("Regression test for Container class failed!");
 
-			if (Interpreter2.test () === false)
+			if (Interpreter.test () === false)
 				alert ("Regression test for Interpreter class failed!");
 
 			if (Reference.test () === false) 
