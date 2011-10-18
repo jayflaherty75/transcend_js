@@ -35,6 +35,7 @@ Core.extend ("Eventcast", "Multicast", /** @lends Eventcast# */ {
 	initialize: function ($super, event_name, memo) {
 		$super ();
 
+		var _type = Core._("Helpers.Type");
 		var pvt = {
 			targets: {},
 			mcast_listen: this.listen.bind (this),
@@ -42,21 +43,7 @@ Core.extend ("Eventcast", "Multicast", /** @lends Eventcast# */ {
 			self: this
 		};
 
-		//--------------------------------------------------------------------
-		/**
-		 * Sets the memo to be passed along with events.
-		 * @name Eventcast#setMemo
-		 * @function
-		 * @param {mixed} Any data to be passed along with the event.
-		 * @return Returns "this" instance for use in chain calls.
-		 * @type Eventcast
-		 */
-		var setMemo = function (new_memo) {
-			memo = new_memo;
-			return this;
-		};
-
-		//--------------------------------------------------------------------
+		//---------------------------------------------------------------------
 		/**
 		 * Handler function to be assigned to object's hook-in.  This calls
 		 * <i>Multicast.call()</i> method along with event parameters sent
@@ -81,7 +68,7 @@ Core.extend ("Eventcast", "Multicast", /** @lends Eventcast# */ {
 			return (pvt.self.call.apply (pvt.self, args));
 		};
 
-		//--------------------------------------------------------------------
+		//---------------------------------------------------------------------
 		/**
 		 * Adds Eventcast function to target hook-in
 		 * @name Eventcast#add_handler
@@ -110,7 +97,7 @@ Core.extend ("Eventcast", "Multicast", /** @lends Eventcast# */ {
 			return mcast_func;
 		};
 
-		//--------------------------------------------------------------------
+		//---------------------------------------------------------------------
 		/**
 		 * Removes Eventcast function from target hook-in
 		 * @name Eventcast#remove_handler
@@ -130,7 +117,7 @@ Core.extend ("Eventcast", "Multicast", /** @lends Eventcast# */ {
 			}
 		};
 
-		//--------------------------------------------------------------------
+		//---------------------------------------------------------------------
 		/**
 		 * Returns the event type being Eventcast
 		 * @name Eventcast#getType
@@ -142,7 +129,21 @@ Core.extend ("Eventcast", "Multicast", /** @lends Eventcast# */ {
 			return event_name;
 		};
 
-		//--------------------------------------------------------------------
+		//---------------------------------------------------------------------
+		/**
+		 * Sets the memo to be passed along with events.
+		 * @name Eventcast#setMemo
+		 * @function
+		 * @param {mixed} Any data to be passed along with the event.
+		 * @return Returns "this" instance for use in chain calls.
+		 * @type Eventcast
+		 */
+		this.setMemo = function (new_memo) {
+			memo = new_memo;
+			return this;
+		};
+
+		//---------------------------------------------------------------------
 		/**
 		 * Adds a target object to the Eventcast.  Events of the specified 
 		 * type from thi target will be Eventcast from this point on.
@@ -154,8 +155,7 @@ Core.extend ("Eventcast", "Multicast", /** @lends Eventcast# */ {
 		 * @type Eventcast
 		 */
 		this.add = function () {
-			var uid;
-			var func = null;
+			var uid, events, func = null;
 
 			for (i = 0; i < arguments.length; i++) {
 				var target = arguments[i];
@@ -173,6 +173,16 @@ Core.extend ("Eventcast", "Multicast", /** @lends Eventcast# */ {
 							target["_bcast_id"] = uid;
 						}
 
+						events = target["_events"];
+
+						if (!events) {
+							events = {};
+							target["_events"] = events;
+						}
+
+						if (_type.isUndefined (events[event_name]))
+							events[event_name] = this;
+
 						if (this.count () > 0) func = add_handler (target);
 
 						pvt.targets[uid] = ({ "target": target, "func": func });
@@ -183,7 +193,7 @@ Core.extend ("Eventcast", "Multicast", /** @lends Eventcast# */ {
 			return this;
 		};
 
-		//--------------------------------------------------------------------
+		//---------------------------------------------------------------------
 		/**
 		 * Removes a target object from the Eventcast.
 		 * @name Eventcast#remove
@@ -207,7 +217,7 @@ Core.extend ("Eventcast", "Multicast", /** @lends Eventcast# */ {
 			return this;
 		};
 
-		//--------------------------------------------------------------------
+		//---------------------------------------------------------------------
 		/**
 		 * Adds a listener to the Eventcast.  Will be called any time one of
 		 * the target objects fires off an event of the type specified to the
@@ -231,7 +241,7 @@ Core.extend ("Eventcast", "Multicast", /** @lends Eventcast# */ {
 			return pvt.mcast_listen (listener);
 		};
 
-		//--------------------------------------------------------------------
+		//---------------------------------------------------------------------
 		/**
 		 * Removes listener function from the Eventcast.
 		 * @name Eventcast#ignore
@@ -266,7 +276,7 @@ Core.extend ("Eventcast", "Multicast", /** @lends Eventcast# */ {
 			return pvt.mcast_ignore (listener);
 		};
 
-		//--------------------------------------------------------------------
+		//---------------------------------------------------------------------
 		for (i = 3; i < arguments.length; i++) {
 			var targets = arguments[i];
 
@@ -274,5 +284,70 @@ Core.extend ("Eventcast", "Multicast", /** @lends Eventcast# */ {
 				this.add (targets);
 		}
 	}
-});
+}, (function () {
+	var _type = Core._("Helpers.Type");
+	var _array = Core._("Helpers.Array");
+	var _eventcast = Core.getClass ("Eventcast");
+	var listen, get;
+
+	//-------------------------------------------------------------------------
+	/**
+	 * Static. Adds a listener function to an object event.  Creates an 
+	 * Eventcast object if none are present. 
+	 * @name Eventcast#listen
+	 * @function
+	 * @param {object} object Target object or array of targets to listen to
+	 * @param {string} event_name Event identifier
+	 * @param {function} listener Listener function
+	 * @return Returns Eventcast object for chain calls
+	 * @type Eventcast
+	 */
+	listen = function (object, event_name, listener) {
+		var objects = _type.isArray (object) ? _array.flatten (object) : [object];
+		var events, ecast;
+
+		object = objects[0];	//Base all actions on the first object passed.
+		events = object["_events"];
+
+		if (!events || _type.isUndefined (events[event_name])) {
+			ecast = Core._("Eventcast", event_name).add (objects);
+		}
+		else {
+			ecast = events[event_name].add (objects);
+		}
+
+		if (_type.isFunction (listener)) {
+			ecast.listen (listener);
+		}
+
+		return ecast;
+	};
+
+	//-------------------------------------------------------------------------
+	/**
+	 * Static. Returns the Eventcast instance associated with a given
+	 * object and event type
+	 * @name Eventcast#get
+	 * @function
+	 * @param {object} object Target object or array of targets to listen to
+	 * @param {string} event_name Event identifier
+	 * @param {function} listener Listener function
+	 * @return Returns Eventcast object for chain calls
+	 * @type Eventcast|false
+	 */
+	get = function (object, event_name) {
+		var events = object["_events"];
+
+		if (_type.isDefined (events) && _type.isDefined (events[event_name])) {
+			return events[event_name];
+		}
+
+		return false;
+	};
+
+	return {
+		listen: listen,
+		get: get
+	};
+}) ());
 

@@ -36,7 +36,6 @@ Core.extend ("Controller", "Interpreter", /** @lends Controller */ (function () 
 
 		this.assign ("_controllers", {});
 		this.assign ("_models", {});
-		this.assign ("_events", {});
 
 		_run = this.run.bind (this);
 

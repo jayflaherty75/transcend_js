@@ -21,6 +21,7 @@
 		"transcend.helper.unique.js",
 		"transcend.helper.type.js",
 		"transcend.helper.string.js",
+		"transcend.helper.array.js",
 		"transcend.container.abstract.js",
 		"transcend.container.js",
 		"transcend.reference.js",
