@@ -3,15 +3,11 @@
  * @fileoverview Defines a hierarchical ConfigBranch class that is
  * 	instantiated as the Config singleton which takes advantage of the Core's
  * 	existing ability to allow for default functions (_).  (TODO: need more desc)
- * 	Requires Core, Property
- * 	<br /><br />
+ * 	Requires Core, Property<br /><br />
  * 
- * 	Date		2011-04-19<br />
  * 	Copyright	&copy; 2011 {@link http://www.jasonkflaherty.com Jason K. Flaherty}<br />
- * 	Bugs<br />
  * @author		{@link http://www.jasonkflaherty.com Jason K. Flaherty}
  * 				{@link mailto:coderx75@hotmail.com coderx75@hotmail.com}
- * @version		0.0.22
  */
 
 //-----------------------------------------------------------------------------
