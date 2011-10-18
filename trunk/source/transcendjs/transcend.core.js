@@ -176,7 +176,7 @@ Core = new (Class.create ( /** @lends Core# */ {
 			var event = "on" + args.shift ();
 			var handler = object[event];
 
-			if (typeof (handler) != "undefined") {
+			if (typeof (handler) == "function") {
 				if (!Event.isEvent (args[0])) {
 					args.unshift (window.event || { clientX: 0 });
 				}
@@ -189,60 +189,28 @@ Core = new (Class.create ( /** @lends Core# */ {
 
 		//--------------------------------------------------------------------
 		/**
-		 * DEPRECATED.  Use Events core branch instead.<br/><br/>
-		 * 
-		 * Registers an event, allowing it to be accessed from the global
-		 * environment.  The <i>namespace</i> parameter allows for events to 
-		 * be grouped into categories to help avoid naming collisions.  The
-		 * <i>name</i> parameter can be anything the caller wishes to name the
-		 * event but will be stored by name and type.  A <i>click</i> event
-		 * for an event named <i>foo</i> would be later accessible as
-		 * <i>foo_click</i>.
-		 * @name Core#event
-		 * @function
-		 * @param {string} namespace Identifier allowing events to be grouped
-		 * @param {string} name Arbitrary event identifier
-		 * @param {Eventcast} bcast Eventcast to be registered
-		 */
-		this.event = function (namespace, name, bcast) {
-			var events = _events[namespace];
-
-			if (Object.isUndefined (events)) {
-				events = {};
-				_events[namespace] = events;
-			}
-
-			if (bcast) {
-				name = name + "_" + bcast.getType ();
-				events[name] = bcast;
-			}
-			else
-				delete events[name];
-		};
-
-		//--------------------------------------------------------------------
-		/**
-		 * Allows for a registered Eventcast to be listened to by a listener
-		 * function.
+		 * Adds a listener function to an object event.  Creates a Multicast
+		 * object if there are more than one listener. 
 		 * @name Core#listen
 		 * @function
-		 * @param {string} namespace Identifier of event group
+		 * @param {object} object Target object to listen to
 		 * @param {string} name Event identifier
-		 * @param {function} func Listener function
-		 * @return Returns the Eventcast listened to
-		 * @type Eventcast
+		 * @param {function} listener Listener function
 		 */
-		this.listen = function (namespace, name, func) {
-			var bcast = null;
+		this.listen = function (object, name, listener) {
+			name = "on" + name;
 
-			if (_events[namespace]) {
-				if (_events[namespace][name]) {
-					bcast = _events[namespace][name];
-					if (func) bcast.listen (func);
-				}
+			if (typeof (object[name]) == "function") {
+				var mcast = object[name].multicast || Core._("Multicast",
+					object[name], 
+					listener
+				);
+
+				if (mcast) object[name] = mcast.call;
 			}
-
-			return bcast;
+			else {
+				object[name] = listener;
+			}
 		};
 
 		//--------------------------------------------------------------------

@@ -22,6 +22,7 @@
 	<script type="text/javascript" src="source/transcendjs/transcend.helper.unique.js"></script>
 	<script type="text/javascript" src="source/transcendjs/transcend.helper.type.js"></script>
 	<script type="text/javascript" src="source/transcendjs/transcend.helper.string.js"></script>
+	<script type="text/javascript" src="source/transcendjs/transcend.helper.array.js"></script>
 	<script type="text/javascript" src="source/transcendjs/transcend.helper.md5.js"></script>
 	<script type="text/javascript" src="source/transcendjs/transcend.container.abstract.js"></script>
 	<script type="text/javascript" src="source/transcendjs/transcend.container.js"></script>
@@ -179,7 +180,6 @@
 
 				onstartup = function () {
 					var scope = this.get ("_models")["mymodel"];
-					var events = this.get ("_events");
 
 					if (_type.isDefined (scope)) {
 						//Load data and begin processing actions once completed
@@ -192,30 +192,25 @@
 						};
 
 						scope.setAttribute ("src", "http://www.whatever.com/index.php");
-
-						//Setup events and handlers
-						events["mouseover"] = new Eventcast ("mouseover", "1px solid black");
-						events["mouseover"].listen (this.$mouseover);
-
-						events["mouseout"] = new Eventcast ("mouseout", "0");
-						events["mouseout"].listen (this.$mouseover);
-
-						events["click"] = new Eventcast ("click");
-						events["click"].listen (this.$click);
 					}
 				};
 
 				render_action = function (event, parent) {
 					//Pass model data to view and render
 					var scope = this.get ("_models")["mymodel"];
-					var events = this.get ("_events");
 					var view = this.view().assign (scope);
 					var elements = view.render (parent);
 
 					//Add generated view elements to Eventcasts
-					events["mouseover"].add (elements["title"], elements["id"], elements["value"][7]);
-					events["mouseout"].add (elements["title"], elements["id"], elements["value"][7]);
-					events["click"].add (elements["id"]);
+					Eventcast.listen (
+						[elements["title"], elements["id"], elements["value"][7]], 
+						"mouseover", this.$mouseover
+					).setMemo ("1px solid black");
+					Eventcast.listen (
+						[elements["title"], elements["id"], elements["value"][7]], 
+						"mouseout", this.$mouseover
+					).setMemo ("0");
+					Eventcast.listen (elements["id"], "click", this.$click);
 				};
 
 				mouseover_action = function (event) {
