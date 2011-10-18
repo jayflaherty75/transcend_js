@@ -331,8 +331,7 @@ Core.extend ("Eventcast", "Multicast", /** @lends Eventcast# */ {
 	 * @function
 	 * @param {object} object Target object or array of targets to listen to
 	 * @param {string} event_name Event identifier
-	 * @param {function} listener Listener function
-	 * @return Returns Eventcast object for chain calls
+	 * @return Returns Eventcast object for chain calls or false if none found
 	 * @type Eventcast|false
 	 */
 	get = function (object, event_name) {
