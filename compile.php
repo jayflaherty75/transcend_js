@@ -2,7 +2,7 @@
 	$output = "";
 	$settings = array (
 		"libfile" => "\\xampp\\htdocs\\clients\\technet_client\\source\\transcendjs\\transcend.js",
-		"outfile" => "\\xampp\\htdocs\\clients\\technet_client\\source\\transcendjs\\transcend-min.js",
+		"outfile" => "\\xampp\\htdocs\\clients\\technet_client\\source\\transcendjs\\transcend.min.js",
 		"jsdoc" => "\\Program Files\\JSDoc\\jsrun.jar",
 		"jsdocrun" => "\\Program Files\\JSDoc\\app\\run.js",
 		"templates" => "\\Program Files\\JSDoc\\templates\\jsdoc",
