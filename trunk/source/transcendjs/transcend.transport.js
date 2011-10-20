@@ -1,34 +1,50 @@
 //-----------------------------------------------------------------------------
 /**
- * @fileoverview Description, required classes, examples
- * 	<br /><br />
+ * @fileoverview Description, required classes, examples<br /><br />
  * 
- * Copyright	&copy; 2011 {@link http://www.jasonkflaherty.com Jason K. Flaherty}<br />
- * @author		{@link http://www.jasonkflaherty.com Jason K. Flaherty}
- * 				{@link mailto:coderx75@hotmail.com coderx75@hotmail.com}
+ * Copyright &copy; 2011 
+ * <a href="http://www.jasonkflaherty.com" target="_blank">Jason K. Flaherty</a>
+ * (<a href="mailto:coderx75@hotmail.com">E-mail</a>)<br />
+ * @author Jason K. Flaherty
  */
 
 //-----------------------------------------------------------------------------
-Core.extend ("TransportController", "Controller", /** @lends ConnectionController */ (function () {
+Core.extend ("TransportController", "Controller", (function () {
 	var _type = Core._("Helpers.Type");
-	var oninit, send_action;
+	var send_action;
 
-	//-------------------------------------------------------------------------
-	/**
-	 * @class Description
-	 * @constructs
-	 */
-	oninit = function () {
-		this.timeout = Core._("Property", 30);
-		this.debug = Core._("Property");
+	var TransportController = /** @lends TransportController.prototype */ {
+		//---------------------------------------------------------------------
+		/**
+		 * @class Description
+		 * @extends Controller
+		 * @constructs
+		 */
+		oninit: function () {
+			//-----------------------------------------------------------------
+			/**
+			 * Description
+			 * @name TransportController#timeout
+			 * @type Property
+			 */
+			this.timeout = Core._("Property", 30);
 
-		this.register ("send", send_action);
+			//-----------------------------------------------------------------
+			/**
+			 * Description
+			 * @name TransportController#debug
+			 * @type Property
+			 */
+			this.debug = Core._("Property");
+
+			this.register ("send", send_action);
+		}
 	};
 
 	//-------------------------------------------------------------------------
 	/**
 	 * Description, events, exceptions, example
-	 * @name ConnectionController#$send
+	 * @name TransportController#$send
 	 * @function
 	 * @param {Event} event Description
 	 * @param {mixed} message Description
@@ -40,8 +56,6 @@ Core.extend ("TransportController", "Controller", /** @lends ConnectionControlle
 		}
 	};
 
-	return {
-		oninit: oninit
-	};
+	return TransportController;
 }) ());
 

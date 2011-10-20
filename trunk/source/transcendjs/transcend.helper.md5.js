@@ -1,11 +1,11 @@
 /**
  * @fileoverview A JavaScript implementation of the RSA Data Security, Inc. MD5 Message
- * Digest Algorithm, as defined in RFC 1321.
- * version 2.1 
- * Copyright (C) Paul Johnston 1999 - 2002.
- * Other contributors: Greg Holt, Andrew Kepert, Ydnar, Lostinet
- * Distributed under the BSD License 
- * {@link http://pajhome.org.uk/crypt/md5} for more info.
+ * Digest Algorithm, as defined in RFC 1321.<br/>
+ * version 2.1<br/>
+ * Copyright (C) Paul Johnston 1999 - 2002.<br/>
+ * Other contributors: Greg Holt, Andrew Kepert, Ydnar, Lostinet<br/>
+ * Distributed under the BSD License <br/>
+ * {@link http://pajhome.org.uk/crypt/md5} for more info.<br/>
  * @author Paul Johnston
  * @version 2.1 
  */

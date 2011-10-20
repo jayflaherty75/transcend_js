@@ -10,7 +10,7 @@
 	<script type="text/javascript" src="source/xmlrpc/xmlrpc_lib.js"></script>
 	<script type="text/javascript" src="source/raphael/raphael-min.js"></script>
 	<?php if (isset ($_REQUEST["action"]) && $_REQUEST["action"] == "test"): ?>
-	<script type="text/javascript" src="source/transcendjs/transcend-min.js"></script>
+	<script type="text/javascript" src="source/transcendjs/transcend.min.js"></script>
 	<?php else: ?>
 	<script type="text/javascript" src="source/transcendjs/transcend.core.js"></script>
 	<script type="text/javascript" src="source/transcendjs/transcend.exception.js"></script>
@@ -23,6 +23,7 @@
 	<script type="text/javascript" src="source/transcendjs/transcend.helper.type.js"></script>
 	<script type="text/javascript" src="source/transcendjs/transcend.helper.string.js"></script>
 	<script type="text/javascript" src="source/transcendjs/transcend.helper.array.js"></script>
+	<script type="text/javascript" src="source/transcendjs/transcend.helper.event.js"></script>
 	<script type="text/javascript" src="source/transcendjs/transcend.helper.md5.js"></script>
 	<script type="text/javascript" src="source/transcendjs/transcend.container.abstract.js"></script>
 	<script type="text/javascript" src="source/transcendjs/transcend.container.js"></script>
@@ -169,6 +170,7 @@
 
 			Core.extend ("MyController", "Controller", (function () {
 				var _type = Core._("Helpers.Type");
+				var _event = Core._("Helpers.Event");
 				var oninit, onstartup, render_action, mouseover_action, click_action;
 
 				oninit = function () {
@@ -214,7 +216,7 @@
 				};
 
 				mouseover_action = function (event) {
-					Event.getTarget(event).style.border = event.memo;
+					_event.getTarget(event).style.border = event.memo;
 				};
 
 				click_action = function (event) {
@@ -222,7 +224,7 @@
 
 					if (_type.isDefined (view)) 
 						view._("output").innerHTML = 
-						$(Event.getTarget(event)).readAttribute ("name") + " clicked";
+						$(_event.getTarget(event)).readAttribute ("name") + " clicked";
 				};
 
 				return {

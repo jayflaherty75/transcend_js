@@ -1,17 +1,33 @@
 //-----------------------------------------------------------------------------
 /**
- * @fileoverview Description, required classes, examples
- * 	<br /><br />
+ * @fileoverview Description, required classes, examples<br /><br />
  * 
- * Copyright	&copy; 2011 {@link http://www.jasonkflaherty.com Jason K. Flaherty}<br />
- * @author		{@link http://www.jasonkflaherty.com Jason K. Flaherty}
- * 				{@link mailto:coderx75@hotmail.com coderx75@hotmail.com}
+ * Copyright &copy; 2011 
+ * <a href="http://www.jasonkflaherty.com" target="_blank">Jason K. Flaherty</a>
+ * (<a href="mailto:coderx75@hotmail.com">E-mail</a>)<br />
+ * @author Jason K. Flaherty
  */
 
-/*---------------------------------------------------------------------------*/
-Core._("Helpers").register ("CSS", new (Class.create ({
-	initialize: function () {
-		this.getStyle = function (selector, file_index) {
+//-----------------------------------------------------------------------------
+Core._("Helpers").register ("CSS", (function () {
+	var _type = Core._("Helpers.Type");
+	var CSSHelpers;
+
+	/**
+	 * @namespace Description
+	 */
+	CSSHelpers = {
+		//---------------------------------------------------------------------
+		/**
+		 * Description, events, exceptions, example
+		 * @memberOf CSSHelpers
+		 * @function
+		 * @param {String} selector Description
+		 * @param {Number} file_index Description
+		 * @return Description
+		 * @type Style
+		 */
+		getStyle: function (selector, file_index) {
 			var result = false;
 
 			if (typeof (file_index) != "undefined") {
@@ -41,9 +57,11 @@ Core._("Helpers").register ("CSS", new (Class.create ({
 			}
 
  			return result;
-		};
+		}
+	};
 
-		this._ = this.getStyle;
-	}
-})) ());
+	CSSHelpers._ = CSSHelpers.getStyle;
+
+	return CSSHelpers;
+}) ());
 

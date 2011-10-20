@@ -1,127 +1,197 @@
 //-----------------------------------------------------------------------------
 /**
- * @fileoverview Description, required classes, examples
- * 	<br /><br />
+ * @fileoverview Description, required classes, examples<br /><br />
  * 
- * Copyright	&copy; 2011 {@link http://www.jasonkflaherty.com Jason K. Flaherty}<br />
- * @author		{@link http://www.jasonkflaherty.com Jason K. Flaherty}
- * 				{@link mailto:coderx75@hotmail.com coderx75@hotmail.com}
+ * Copyright &copy; 2011 
+ * <a href="http://www.jasonkflaherty.com" target="_blank">Jason K. Flaherty</a>
+ * (<a href="mailto:coderx75@hotmail.com">E-mail</a>)<br />
+ * @author Jason K. Flaherty
  */
 
 /*---------------------------------------------------------------------------*/
-Core.extend ("Controller", "Interpreter", /** @lends Controller */ (function () {
+Core.extend ("Controller", "Interpreter", (function () {
 	var _type = Core._("Helpers.Type");
 	var _ref_class = Core.getClass ("Reference");
-	var _handler, _register, _get_listener, _immediate_mode_onchange, oninit;
+	var _handler, _immediate_mode_onchange, oninit;
 	var _initialize, _uninitialize, _batch_start, _batch_end;
-	var create_batch, batch;
-	var _register_simple;
 
-	//-------------------------------------------------------------------------
-	/**
-	 * @class Description
-	 * @constructs
-	 * @param {Context} context Description
-	 */
-	oninit = function (context) {
-		//var _actions = new Array ();
-		var _run;
-
-		this.view = Core._("Property");
-		this.immediateMode = Core._("Property", false);
-		this.immediateMode.onchange = _immediate_mode_onchange.bind (this);
-		this.context (context || Core._("NodeContext"));
-
-		this._actions = new Array ();
-
-		this.assign ("_controllers", {});
-		this.assign ("_models", {});
-
-		_run = this.run.bind (this);
-
+	var Controller = /** @lends Controller.prototype */ {
 		//---------------------------------------------------------------------
 		/**
-		 * Description
-		 * @name Controller#action
-		 * @function
-		 * @param {String} action_name Description
-		 * @param {Event} event Optional. Description
-		 * @param {varargs} ... Description
+		 * @class Description
+		 * @extends Interpreter
+		 * @constructs
+		 * @param {Context} context Description
 		 */
-		this.action = function () {
-			if (_type.isArray (arguments[0])) {
-				var batch = arguments[0];
-				var i, args;
+		oninit: function (context) {
+			var _event = Core._("Helpers.Event");
+			//var _actions = new Array ();
+			var _run;
 
-				for (i = 0, args=batch[0]; i < batch.length; args=batch[++i]) {
-					if (_type.isArray (args)) {
-						this.action.apply (this, args);
+			//-----------------------------------------------------------------
+			/**
+			 * Description
+			 * @name Controller#view
+			 * @type Property
+			 */
+			this.view = Core._("Property");
+
+			//-----------------------------------------------------------------
+			/**
+			 * Description
+			 * @name Controller#immediateMode
+			 * @type Property
+			 */
+			this.immediateMode = Core._("Property", false);
+			this.immediateMode.onchange = _immediate_mode_onchange.bind (this);
+
+			//-----------------------------------------------------------------
+			/**
+			 * Description
+			 * @name Controller#_actions
+			 * @private
+			 * @type Array
+			 */
+			this._actions = new Array ();
+
+			this.context (context || Core._("NodeContext"));
+
+			this.assign ("_controllers", {});
+			this.assign ("_models", {});
+
+			_run = this.run.bind (this);
+
+			//-----------------------------------------------------------------
+			/**
+			 * Description
+			 * @name Controller#action
+			 * @function
+			 * @param {String} action_name Description
+			 * @param {Event} event Optional. Description
+			 * @param {varargs} ... Description
+			 */
+			this.action = function () {
+				if (_type.isArray (arguments[0])) {
+					var batch = arguments[0];
+					var i, args;
+
+					for (i = 0, args=batch[0]; i < batch.length; args=batch[++i]) {
+						if (_type.isArray (args)) {
+							this.action.apply (this, args);
+						}
 					}
 				}
-			}
-			else {
-				var args = new Array ();
-				var action_name = arguments[0];
-				var action;
-				var arg_val;
+				else {
+					var args = new Array ();
+					var action_name = arguments[0];
+					var action;
+					var arg_val;
 
-				if (action_name instanceof _ref_class)
-					action_name = action_name.getValue ();
+					if (action_name instanceof _ref_class)
+						action_name = action_name.getValue ();
 
-				for (var i = 1; i < arguments.length; i++) {
-					arg_val = arguments[i];
+					for (var i = 1; i < arguments.length; i++) {
+						arg_val = arguments[i];
 
-					if (arg_val instanceof _ref_class)
-						args.push (arg_val.getValue ());
-					else
-						args.push (arg_val);
+						if (arg_val instanceof _ref_class)
+							args.push (arg_val.getValue ());
+						else
+							args.push (arg_val);
+					}
+
+					action = {
+						action: action_name,
+						arguments: args
+					};
+
+					if (!_event.isEvent (args[0])) {
+						args.unshift (window.event || { clientX: 0 });
+					}
+
+					this._actions.push (action);
+
+					if (_type.isFunction (this.onaction)) 
+						this.onaction (action_name, action);
 				}
+			};
 
-				action = {
-					action: action_name,
-					arguments: args
-				};
+			//-----------------------------------------------------------------
+			/**
+			 * Description
+			 * @name Controller#run
+			 * @function
+			 * @return Description
+			 * @type mixed|false
+			 */
+			this.run = function () {
+				var actions = this._actions;
+				var result;
 
-				if (!Event.isEvent (args[0])) {
-					args.unshift (window.event || { clientX: 0 });
-				}
+				this._actions = new Array ();
+				result = _run (actions);
 
-				this._actions.push (action);
+				return result;
+			};
 
-				if (_type.isFunction (this.onaction)) 
-					this.onaction (action_name, action);
-			}
-		};
+			this.handler (_handler);
 
-		//---------------------------------------------------------------------
+			this.register ("initialize", _initialize);
+			this.register ("uninitialize", _uninitialize);
+			this.register ("batch_start", _batch_start);
+			this.register ("batch_end", _batch_end);
+
+			this.action ("initialize");
+		},
+
+		//-------------------------------------------------------------------------
 		/**
 		 * Description
-		 * @name Controller#run
+		 * @name Controller#register
 		 * @function
-		 * @return Description
-		 * @type mixed|false
+		 * @param {String} action_name Description
+		 * @param {Function} action_handler Description
 		 */
-		this.run = function () {
-			var actions = this._actions;
-			var result;
+		register: function (action_name, action_handler) {
+			var self = this;
+			var name = "$" + action_name;
 
-			this._actions = new Array ();
-			result = _run (actions);
+			this.registerSimple (action_name, action_handler);
+			self[name.replace (/[\.]/g, "_")] = this.getListener (action_name);
+		},
 
-			return result;
-		};
+		//-------------------------------------------------------------------------
+		/**
+		 * Description
+		 * @name Controller#registerSimple
+		 * @function
+		 * @param {String} action_name Description
+		 * @param {Function} action_handler Description
+		 */
+		registerSimple: function (action_name, action_handler) {
+			var self = this;
 
-		this.handler (_handler);
-		this.register = _register;
-		this.registerSimple = _register_simple;
-		this.getListener = _get_listener;
+			this.context ().register (action_name, function (action, params, nodes) {
+				return action_handler.apply (this, params);
+			});
+		},
 
-		this.register ("initialize", _initialize);
-		this.register ("uninitialize", _uninitialize);
-		this.register ("batch_start", _batch_start);
-		this.register ("batch_end", _batch_end);
+		//-------------------------------------------------------------------------
+		/**
+		 * Description
+		 * @name Controller#getListener
+		 * @function
+		 * @param {String} action_name Description
+		 * @return Description
+		 * @type Function
+		 */
+		getListener: function (action_name) {
+			return function () {
+				var args = $A(arguments);
 
-		this.action ("initialize");
+				args.unshift (action_name);
+				this.action.apply (this, args);
+			}.bind (this);
+		}
 	};
 
 	//-------------------------------------------------------------------------
@@ -166,8 +236,9 @@ Core.extend ("Controller", "Interpreter", /** @lends Controller */ (function () 
 
 	//-------------------------------------------------------------------------
 	/**
-	 * Private. Description
-	 * @name Controller#_handler
+	 * Description
+	 * @name Controller#_default_handler
+	 * @private
 	 * @function
 	 * @param {mixed} symbol Description
 	 */
@@ -191,57 +262,8 @@ Core.extend ("Controller", "Interpreter", /** @lends Controller */ (function () 
 	//-------------------------------------------------------------------------
 	/**
 	 * Description
-	 * @name Controller#register
-	 * @function
-	 * @param {String} action_name Description
-	 * @param {Function} action_handler Description
-	 */
-	_register = function (action_name, action_handler) {
-		var self = this;
-		var name = "$" + action_name;
-
-		this.registerSimple (action_name, action_handler);
-		self[name.replace (/[\.]/g, "_")] = this.getListener (action_name);
-	};
-
-	//-------------------------------------------------------------------------
-	/**
-	 * Description
-	 * @name Controller#registerSimple
-	 * @function
-	 * @param {String} action_name Description
-	 * @param {Function} action_handler Description
-	 */
-	_register_simple = function (action_name, action_handler) {
-		var self = this;
-
-		this.context ().register (action_name, function (action, params, nodes) {
-			return action_handler.apply (this, params);
-		});
-	};
-
-	//-------------------------------------------------------------------------
-	/**
-	 * Description
-	 * @name Controller#getListener
-	 * @function
-	 * @param {String} action_name Description
-	 * @return Description
-	 * @type Function
-	 */
-	_get_listener = function (action_name) {
-		return function () {
-			var args = $A(arguments);
-
-			args.unshift (action_name);
-			this.action.apply (this, args);
-		}.bind (this);
-	};
-
-	//-------------------------------------------------------------------------
-	/**
-	 * Description
-	 * @name Controller#immediateMode
+	 * @name Controller#_immediate_mode_onchange
+	 * @private
 	 * @function
 	 * @param {boolean} mode Description
 	 */
@@ -274,13 +296,20 @@ Core.extend ("Controller", "Interpreter", /** @lends Controller */ (function () 
 		return oldmode;
 	};
 
-	return {
-		oninit: oninit,
-		createBatch: create_batch,
-		batch: batch
-	};
-}) (), {
-	test: function () {
+	return Controller;
+}) (), 
+(function () {
+	var _type = Core._("Helpers.Type");
+
+	//--------------------------------------------------------------------------
+	/**
+	 * Description, events, exceptions, example
+	 * @static
+	 * @memberOf Controller
+	 * @return true on pass, false on fail
+	 * @type boolean
+	 */
+	var test = function () {
 		var _output = "";
 		var batch_ctrl = Core._ ("Controller");
 
@@ -325,6 +354,10 @@ Core.extend ("Controller", "Interpreter", /** @lends Controller */ (function () 
 			return true;
 
 		return false;
-	}
-});
+	};
+
+	return {
+		test: test
+	};
+}) ());
 

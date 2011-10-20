@@ -5,52 +5,41 @@
  * 	handling and event management as well as a contextual data-driven 
  * 	interpreter.<br /><br />
  * 
- * 	Date		2011-02-01<br />
- * 	Copyright	&copy; 2011 {@link http://www.jasonkflaherty.com Jason K. Flaherty}<br />
- * 	Bugs<br />
- * @author		Jason K. Flaherty coderx75@hotmail.com
- * @version		0.0.22
+ * Copyright &copy; 2011 
+ * <a href="http://www.jasonkflaherty.com" target="_blank">Jason K. Flaherty</a>
+ * (<a href="mailto:coderx75@hotmail.com">E-mail</a>)<br />
+ * @author Jason K. Flaherty
  */
 
 //-----------------------------------------------------------------------------
-/** Tech Net {@link Core} singleton */
-Core = new (Class.create ( /** @lends Core# */ {
-	/**
-	 * @class Singleton maintaining all classes, interfaces and singletons and 
-	 * 	provides an interface for registering events and listening for these 
-	 * 	events without cluttering up the global environment (Core.globalize() 
-	 * 	makes these globally accessible if preferred).  Initializes the Tech 
-	 * 	Net framework.
-	 * @constructs
-	 */
-	initialize: function () {
-		var _toString = Object.prototype.toString;
-		var _objects = {};
-		var _events = { global: {}};
-		var _instances = {};
-		var _instance_count = 1;
+(function () {
+	var _toString = Object.prototype.toString;
+	var _objects = {};
+	var _events = { global: {}};
+	var _instances = {};
+	var _instance_count = 1;
+	var save_instance;
 
+	/**
+	 * @namespace Singleton maintaining all classes, interfaces and singletons 
+	 * and provides an interface for registering events and listening for these 
+	 * events without cluttering up the global environment (Core.globalize() 
+	 * makes these globally accessible if preferred).  Initializes the Tech 
+	 * Net framework.
+	 */
+	Core = {
 		/**
 		 * Version of Tech Net Client.
 		 * @name Core#version
 		 * @type Constant
 		 */
-		this.version = "0.0.22";
-
-		//--------------------------------------------------------------------
-		var save_instance = function (instance) {
-			instance["instance_id"] = _instance_count;
-			_instances[_instance_count] = instance;
-			_instance_count++;
-
-			return instance;
-		};
+		version: "0.0.22",
 
 		//--------------------------------------------------------------------
 		/**
 		 * Create a new class constructor that may be instantiated from Core
 		 * interface.  This may be done by calling <b>Core._{"ClassName")</b>.
-		 * @name Core#register
+		 * @memberOf Core
 		 * @function
 		 * @param {string} name Name of class
 		 * @param {object} methods Class prototype
@@ -58,7 +47,7 @@ Core = new (Class.create ( /** @lends Core# */ {
 		 * @return Class constructor of the newly registered class
 		 * @type object
 		 */
-		this.register = function (name, methods, statics) {
+		register: function (name, methods, statics) {
 			var object;
 
 			if (Object.isFunction (methods))
@@ -72,13 +61,13 @@ Core = new (Class.create ( /** @lends Core# */ {
 			_objects[name] = object;
 
 			return object;
-		};
+		},
 
 		//--------------------------------------------------------------------
 		/**
 		 * Create a new class constructor by extending a class that has
 		 * been registered from the Core interface.
-		 * @name Core#extend
+		 * @memberOf Core
 		 * @function
 		 * @param {string} name Name of class
 		 * @param {string} parent Name of parent class
@@ -87,7 +76,7 @@ Core = new (Class.create ( /** @lends Core# */ {
 		 * @return Class constructor of the newly registered class
 		 * @type object
 		 */
-		this.extend = function (name, parent, methods, statics) {
+		extend: function (name, parent, methods, statics) {
 			var object;
 
 			if (Object.isString (parent))
@@ -122,14 +111,14 @@ Core = new (Class.create ( /** @lends Core# */ {
 			_objects[name] = object;
 
 			return object;
-		};
+		},
 
 		//--------------------------------------------------------------------
 		/**
 		 * Accepts either a constructor or object for its <i>methods</i>
 		 * parameter and registers an interface object accessible via the
 		 * <b>Core._()</b> method.
-		 * @name Core#singleton
+		 * @memberOf Core
 		 * @function
 		 * @param {string} name Name of singleton
 		 * @param {object} methods Class prototype
@@ -137,7 +126,7 @@ Core = new (Class.create ( /** @lends Core# */ {
 		 * @return Interface of the newly registered singleton
 		 * @type object
 		 */
-		this.singleton = function (name, methods, statics) {
+		singleton: function (name, methods, statics) {
 			var object;
 
 			if (Object.isFunction (methods.initialize)) {
@@ -152,7 +141,7 @@ Core = new (Class.create ( /** @lends Core# */ {
 			_objects[name] = object;
 
 			return object;
-		};
+		},
 
 		//--------------------------------------------------------------------
 		/**
@@ -161,7 +150,7 @@ Core = new (Class.create ( /** @lends Core# */ {
 		 * function and call it.  This carries little overhead and is the 
 		 * prefered method.  Although this method carries a lot of overhead,
 		 * however, it provides the option of brevity.
-		 * @name Core#trigger
+		 * @memberOf Core
 		 * @function
 		 * @param {mixed} object The object triggering the event
 		 * @param {string} event The name of the event, such as "click"
@@ -170,14 +159,14 @@ Core = new (Class.create ( /** @lends Core# */ {
 		 * 	was present.
 		 * @type mixed|false
 		 */
-		this.trigger = function () {
+		trigger: function () {
 			var args = $A(arguments);
 			var object = args.shift ();
 			var event = "on" + args.shift ();
 			var handler = object[event];
 
 			if (typeof (handler) == "function") {
-				if (!Event.isEvent (args[0])) {
+				if (!Core._("Helpers.Event").isEvent (args[0])) {
 					args.unshift (window.event || { clientX: 0 });
 				}
 
@@ -185,19 +174,19 @@ Core = new (Class.create ( /** @lends Core# */ {
 			}
 
 			return false;
-		};
+		},
 
 		//--------------------------------------------------------------------
 		/**
 		 * Adds a listener function to an object event.  Creates a Multicast
 		 * object if there are more than one listener. 
-		 * @name Core#listen
+		 * @memberOf Core
 		 * @function
 		 * @param {object} object Target object to listen to
 		 * @param {string} name Event identifier
 		 * @param {function} listener Listener function
 		 */
-		this.listen = function (object, name, listener) {
+		listen: function (object, name, listener) {
 			name = "on" + name;
 
 			if (typeof (object[name]) == "function") {
@@ -211,20 +200,20 @@ Core = new (Class.create ( /** @lends Core# */ {
 			else {
 				object[name] = listener;
 			}
-		};
+		},
 
 		//--------------------------------------------------------------------
 		/**
 		 * Adds a global reference to a registered class, singleton or 
 		 * interface to the global namespace.  If no name is provided, all
 		 * registrations are copied.
-		 * @name Core#globalize
+		 * @memberOf Core
 		 * @function
 		 * @param {string} name Name of class, singleton or interface. Optional
 		 * @param {boolean} overwrite Determines whether global values should
 		 * 		be overwritten.  Default is <i>false</i>
 		 */
-		this.globalize = function (name, overwrite) {
+		globalize: function (name, overwrite) {
 			overwrite = (overwrite === false ? false : true);
 
 			if (typeof (name) == "string") {
@@ -237,50 +226,50 @@ Core = new (Class.create ( /** @lends Core# */ {
 					this.globalize (pairs.key, overwrite);
 				}.bind (this));
 			}
-		};
+		},
 
 		//--------------------------------------------------------------------
 		/**
 		 * Uses "$" instead of Core for those that prefer a 
 		 * Prototype-/jQuery-style shortcut.
-		 * @name Core#dollarize
+		 * @memberOf Core
 		 * @function
 		 */
-		this.dollarize = function () {
+		dollarize: function () {
 			window["$"] = window["Core"];
 			delete window["Core"];
-		};
+		},
 
 		//--------------------------------------------------------------------
 		/**
 		 * Returns the class contructor of either a class previously registered
 		 * or from the global namespace if not found.
-		 * @name Core#getClass
+		 * @memberOf Core
 		 * @function
 		 * @param {string} name Name of class
 		 * @return Class constructor
 		 * @type function
 		 */
-		this.getClass = function (name) {
+		getClass: function (name) {
 			var c = _objects[name];
 
 			if (typeof (c) == "undefined") c = window[name];
 			if (typeof (c) == "undefined") return null;
 
 			return c;
-		};
+		},
 
 		//--------------------------------------------------------------------
 		/**
 		 * Returns an instance of the requested class.  If not a class, 
 		 * returns the interface object.
-		 * @name Core#getInstance
+		 * @memberOf Core
 		 * @function
 		 * @param {string} name Name of class, singleton or interface
 		 * @return New instance
 		 * @type object
 		 */
-		this.getInstance = function () {
+		getInstance: function () {
 			var args = $A(arguments);
 			var name = args.shift ();
 			var c = this.getClass (name);
@@ -296,17 +285,17 @@ Core = new (Class.create ( /** @lends Core# */ {
 			}
 
 			return object;
-		};
+		},
 
 		//--------------------------------------------------------------------
 		/**
 		 * Calls uninitialize() method of instance if available and deletes
 		 * the instance.
-		 * @name Core#destroy
+		 * @memberOf Core
 		 * @function
 		 * @param {object} instance Object instance to be destructed.
 		 */
-		this.destroy = function (instance) {
+		destroy: function (instance) {
 			if (typeof (instance) == "object") {
 				if (!Object.isUndefined (instance.uninitialize)) {
 					instance.uninitialize ();
@@ -316,20 +305,20 @@ Core = new (Class.create ( /** @lends Core# */ {
 					delete _instances[instance.instance_id];
 				}
 			}
-		};
+		},
 
 		//--------------------------------------------------------------------
 		/**
 		 * Returns the object's unique identifier.  If the ID is not set, a
 		 * new one is created for it.
-		 * @name Core#getID
+		 * @memberOf Core
 		 * @function
 		 * @param {Object} object Anything that can be used as an object.
 		 * 	This includes Numbers.
 		 * @return A hexidecimal string value representing the identifier
 		 * @type String
 		 */
-		this.getID = function (object) {
+		getID: function (object) {
 			if (typeof (object) != "undefined" && object != null) {
 				if (typeof (object._uid) == "undefined") {
 					return this.setID (object);
@@ -339,19 +328,19 @@ Core = new (Class.create ( /** @lends Core# */ {
 			}
 
 			return false;
-		};
+		},
 
 		//--------------------------------------------------------------------
 		/**
 		 * 
-		 * @name Core#getID
+		 * @memberOf Core
 		 * @function
 		 * @param {Object} object Anything that can be used as an object.
 		 * 	This includes Numbers.
 		 * @return A hexidecimal string value representing the identifier
 		 * @type String
 		 */
-		this.setID = function (object, identifier) {
+		setID: function (object, identifier) {
 			if (typeof (object) != "undefined") {
 				object._uid = identifier || this._("Helpers.Unique").hex ();
 
@@ -359,7 +348,7 @@ Core = new (Class.create ( /** @lends Core# */ {
 			}
 
 			return false;
-		};
+		},
 
 		//--------------------------------------------------------------------
 		/**
@@ -368,7 +357,7 @@ Core = new (Class.create ( /** @lends Core# */ {
 		 * methods (_) of interfaces by passing a period-delimited chain as
 		 * the name parameter.  Rather than Core._("Helpers")._("Context")._("XML"),
 		 * the simpler chained call can be used: Core._("Helpers.Context.XML").
-		 * @name Core#_
+		 * @memberOf Core
 		 * @function
 		 * @param {string} name Name of class, singleton or interface.  Also
 		 * 	accepts a period (.) delimited string of names, chaining through
@@ -376,7 +365,7 @@ Core = new (Class.create ( /** @lends Core# */ {
 		 * @return New instance
 		 * @type object
 		 */
-		this._ = function () {
+		_: function () {
 			var args = $A(arguments);
 			var identifiers = args.shift ().split (".");
 			var identifier = identifiers.shift ();
@@ -407,75 +396,30 @@ Core = new (Class.create ( /** @lends Core# */ {
 			}
 
 			return object;
-		};
+		}
+	};
 
-		//--------------------------------------------------------------------
-		Object.extend (Event, 
-			/** @lends Event */
-			{
-			/**
-			 * IE workaround to read event type set by Tech Net
-			 * @name Event#getType
-			 * @function
-			 * @param {Event} evt Any valid Event object
-			 * @return Name of the event type
-			 * @type string
-			 */
-			getType: function (evt) {
-				if (evt) {
-					if (evt.tn_type)
-						return evt.tn_type;
-					else if (evt.type)
-						return evt.type;
-				}
+	//-------------------------------------------------------------------------
+	/**
+	 * Description, events, exceptions, example
+	 * @memberOf Core
+	 * @function
+	 * @private
+	 * @param {mixed} instance Description
+	 * @return Description
+	 * @type mixed
+	 */
+	save_instance = function (instance) {
+		instance["instance_id"] = _instance_count;
+		_instances[_instance_count] = instance;
+		_instance_count++;
 
-				return false;
-			},
-
-			/**
-			 * IE workaround to read event target object set by Tech Net.
-			 * Any object event (hook-in) may be Eventcast.
-			 * @name Event#getTarget
-			 * @function
-			 * @param {Event} evt Any valid Event object
-			 * @return Target object (not restricted to DOM elements)
-			 * @type object
-			 */
-			getTarget: function (evt) {
-				if (evt) {
-					if (evt.tn_target)
-						return evt.tn_target;
-					else if (evt.target)
-						return evt.target;
-					else if (evt.srcElement)
-						return evt.srcElement;
-				}
-
-				return false;
-			},
-
-			/**
-			 * IE (instanceof) workaround to test that an object is an Event
-			 * @name Event#isEvent
-			 * @function
-			 * @param {Event} evt Any valid Event object
-			 * @return <i>True</i> if object is an instance of Event
-			 * @type boolean
-			 */
-			isEvent: function (evt) {
-				if (evt == null) return false;
-				if (typeof (evt) != "object") return false; 
-				if (Object.isUndefined (evt.clientX) &&
-					Object.isUndefined (evt.defaultPrevented)) return false;
-
-				return true;
-			}
-		});
-	}
-})) ();
+		return instance;
+	};
+}) ();
 
 //-----------------------------------------------------------------------------
-Core.register ("CoreBranch", /** @lends CoreBranch */ {
+Core.register ("CoreBranch", /** @lends CoreBranch.prototype */ {
 	/**
 	 * @class Provides method of adding organized, "branched" systems to the
 	 * 	Core framework.  These may be simply accessed using the Core default
@@ -531,8 +475,8 @@ Core.register ("CoreBranch", /** @lends CoreBranch */ {
 });
 
 //-----------------------------------------------------------------------------
-Core.singleton ("Helpers", /** @lends Helpers */ Core._("CoreBranch"));
+Core.singleton ("Helpers", Core._("CoreBranch"));
 
 //-----------------------------------------------------------------------------
-Core.singleton ("Events", /** @lends Events */ Core._("CoreBranch"));
+Core.singleton ("Events", Core._("CoreBranch"));
 

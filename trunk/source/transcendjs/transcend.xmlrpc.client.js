@@ -2,38 +2,54 @@
 /**
  * @fileoverview Description, required classes, examples<br /><br />
  * 
- * Copyright	&copy; 2011 {@link http://www.jasonkflaherty.com Jason K. Flaherty}<br />
- * @author		{@link http://www.jasonkflaherty.com Jason K. Flaherty}
- * 				{@link mailto:coderx75@hotmail.com coderx75@hotmail.com}
+ * Copyright &copy; 2011 
+ * <a href="http://www.jasonkflaherty.com" target="_blank">Jason K. Flaherty</a>
+ * (<a href="mailto:coderx75@hotmail.com">E-mail</a>)<br />
+ * @author Jason K. Flaherty
  */
 
 //-----------------------------------------------------------------------------
-Core.extend ("XmlRpcClient", "ClientController", /** @lends XmlRpcClient */ (function () {
+Core.extend ("XmlRpcClient", "ClientController", (function () {
 	var _type = Core._("Helpers.Type");
 	var _convert_msg = Core._("Helpers.XmlRpc").convertMessage;
-	var oninit, _default, onbatchstart, onbatchend;
+	var _default;
 
-	//-------------------------------------------------------------------------
-	/**
-	 * @class Description
-	 * @extends ClientController
-	 * @constructs
-	 */
-	oninit = function () {
+	var XmlRpcClient = /** @lends XmlRpcClient.prototype */ {
+		//---------------------------------------------------------------------
 		/**
-		 * Private. Description
-		 * @name XmlRpcClient#_batch_mode
-		 * @type Property
+		 * @class Description
+		 * @extends ClientController
+		 * @constructs
 		 */
-		this._batch = false;
+		oninit: function () {
+			//-----------------------------------------------------------------
+			/**
+			 * Description
+			 * @name XmlRpcClient#_batch_mode
+			 * @type Property
+			 */
+			this._batch = false;
 
-		this.register ("_default", _default);
+			this.register ("_default", _default);
+		},
+
+		//---------------------------------------------------------------------
+		onbatchstart: function () {
+			this._batch = new Array ();
+		},
+
+		//---------------------------------------------------------------------
+		onbatchend: function () {
+			this.action ("_send", this._batch);
+			this._batch = false;
+		}
 	};
 
-	//-------------------------------------------------------------------------
+	//---------------------------------------------------------------------
 	/**
-	 * Private. Description, events, exceptions, example
+	 * Description, events, exceptions, example
 	 * @name XmlRpcClient#$_default
+	 * @private
 	 * @function
 	 * @param {String} id Description
 	 * @param {Object} params Description
@@ -55,21 +71,6 @@ Core.extend ("XmlRpcClient", "ClientController", /** @lends XmlRpcClient */ (fun
 		}
 	};
 
-	//-------------------------------------------------------------------------
-	onbatchstart = function () {
-		this._batch = new Array ();
-	};
-
-	//-------------------------------------------------------------------------
-	onbatchend = function () {
-		this.action ("_send", this._batch);
-		this._batch = false;
-	};
-
-	return {
-		oninit: oninit,
-		onbatchstart: onbatchstart,
-		onbatchend: onbatchend
-	};
+	return XmlRpcClient;
 }) ());
 

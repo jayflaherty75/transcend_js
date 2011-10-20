@@ -22,6 +22,7 @@
 		"transcend.helper.type.js",
 		"transcend.helper.string.js",
 		"transcend.helper.array.js",
+		"transcend.helper.event.js",
 		"transcend.container.abstract.js",
 		"transcend.container.js",
 		"transcend.reference.js",
@@ -59,7 +60,7 @@
 		"transcend.xmlrpc.client.js",
 	);
 	$exec_docs = "java -jar \"" . $settings["jsdoc"] . "\" \"" . 
-		$settings["jsdocrun"] . "\" -a -t=\"" . $settings["templates"] . 
+		$settings["jsdocrun"] . "\" -a -p -v -t=\"" . $settings["templates"] . 
 		"\" -d=\"" . $settings["docs"] . "\" \"" . $settings["scripts"] . "\"";
 	$exec_compress = "java -jar \"" . $settings["compressor"] . "\" -v " . 
 		$settings["libfile"] . " -o " . $settings["outfile"];
