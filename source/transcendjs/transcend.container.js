@@ -1,135 +1,125 @@
 //-----------------------------------------------------------------------------
 /**
- * @fileoverview Description, required classes, examples
- * 	<br /><br />
+ * @fileoverview Description, required classes, examples<br /><br />
  * 
- * Copyright	&copy; 2011 {@link http://www.jasonkflaherty.com Jason K. Flaherty}<br />
- * @author		{@link http://www.jasonkflaherty.com Jason K. Flaherty}
- * 				{@link mailto:coderx75@hotmail.com coderx75@hotmail.com}
+ * Copyright &copy; 2011 
+ * <a href="http://www.jasonkflaherty.com" target="_blank">Jason K. Flaherty</a>
+ * (<a href="mailto:coderx75@hotmail.com">E-mail</a>)<br />
+ * @author Jason K. Flaherty
  */
 
 //-----------------------------------------------------------------------------
-Core.extend ("Container", "ContainerAbstract", (
-/**
- * @class Basic container providing a generic interface for assigning
- * 	values to objects.
- * @constructs
- */
-function () {
+Core.extend ("Container", "ContainerAbstract", (function () {
 	var _type = Core._("Helpers.Type");
 
-	//---------------------------------------------------------------------
-	/**
-	 * Description.
-	 * @name Container#oninit
-	 * @function
-	 */
-	var oninit = function () {
-		this.parameters = {};
-	};
+	var Container = /** @lends Container.prototype */ {
+		//---------------------------------------------------------------------
+		/**
+		 * @class Basic container providing a generic interface for assigning
+		 * 	values to objects.
+		 * @constructs
+		 * @extends ContainerAbstract
+		 */
+		oninit: function () {
+			this.parameters = {};
+		},
 
-	//---------------------------------------------------------------------
-	/**
-	 * Handles assigned values for the base class.
-	 * @name Container#onset
-	 * @function
-	 * @param {string} key 
-	 * @param {string} value 
-	 */
-	var onset = function (key, value) { this.parameters[key] = value; };
+		//---------------------------------------------------------------------
+		/**
+		 * Handles assigned values for the base class.
+		 * @name Container#onset
+		 * @function
+		 * @param {string} key 
+		 * @param {string} value 
+		 */
+		onset: function (key, value) { this.parameters[key] = value; },
 
-	//---------------------------------------------------------------------
-	/**
-	 * Description.
-	 * @name Container#isset
-	 * @function
-	 * @param {string} key 
-	 */
-	var isset = function (key) {
-		return _type.isDefined (this.parameters[key]);
-	}; 
+		//---------------------------------------------------------------------
+		/**
+		 * Description.
+		 * @name Container#isset
+		 * @function
+		 * @param {string} key 
+		 */
+		isset: function (key) {
+			return _type.isDefined (this.parameters[key]);
+		},
 
-	//---------------------------------------------------------------------
-	/**
-	 * Handles requests for values from the base class.
-	 * @name Container#onget
-	 * @function
-	 * @param {string} key 
-	 * @return Returns the value from the given key.
-	 * @type Any
-	 */
-	var onget = function (key) {
-		if (!_type.isUndefined (key))
-			return this.parameters[key];
-		else
-			return false;
-	};
+		//---------------------------------------------------------------------
+		/**
+		 * Handles requests for values from the base class.
+		 * @name Container#onget
+		 * @function
+		 * @param {string} key 
+		 * @return Returns the value from the given key.
+		 * @type Any
+		 */
+		onget: function (key) {
+			if (!_type.isUndefined (key))
+				return this.parameters[key];
+			else
+				return false;
+		},
 
-	//---------------------------------------------------------------------
-	/**
-	 * Description
-	 * @name Container#onkeys
-	 * @function
-	 * @return Returns an array of existing keys from the local container.
-	 * @type Array|false
-	 */
-	var onkeys = function () {
-		var set = new Array ();
+		//---------------------------------------------------------------------
+		/**
+		 * Description
+		 * @name Container#onkeys
+		 * @function
+		 * @return Returns an array of existing keys from the local container.
+		 * @type Array|false
+		 */
+		onkeys: function () {
+			var set = new Array ();
 
-		for (key in this.parameters) {
-			set.push (key);
+			for (key in this.parameters) {
+				set.push (key);
+			}
+
+			return set;
+		},
+
+		//---------------------------------------------------------------------
+		/**
+		 * Handles requests to delete values.  If no key is passed, all values
+		 * are cleared.
+		 * @name Container#onunset
+		 * @function
+		 * @param {string} key 
+		 * @return Returns the deleted value from the given key.
+		 * @type Any
+		 */
+		onunset: function (key) {
+			if (!_type.isUndefined (key))
+				delete this.parameters[key];
+		},
+
+		//---------------------------------------------------------------------
+		/**
+		 * 
+		 * @name Container#oncopy
+		 * @function
+		 * @param {Container} dest 
+		 */
+		oncopy: function (dest) {
+			dest.assign (this.parameters);
 		}
-
-		return set;
 	};
 
-	//---------------------------------------------------------------------
-	/**
-	 * Handles requests to delete values.  If no key is passed, all values
-	 * are cleared.
-	 * @name Container#onunset
-	 * @function
-	 * @param {string} key 
-	 * @return Returns the deleted value from the given key.
-	 * @type Any
-	 */
-	var onunset = function (key) {
-		if (!_type.isUndefined (key))
-			delete this.parameters[key];
-	};
+	return Container;
+}) (), 
+(function () {
+	var _type = Core._("Helpers.Type");
 
-	//---------------------------------------------------------------------
-	/**
-	 * 
-	 * @name Container#oncopy
-	 * @function
-	 * @param {Container} dest 
-	 */
-	var oncopy = function (dest) {
-		dest.assign (this.parameters);
-	};
-
-	return {
-		parameters:		false,
-		oninit:			oninit,
-		onset:			onset,
-		isset:			isset,
-		onget:			onget,
-		onunset:		onunset,
-		oncopy:			oncopy
-	};
-}) (),
-{
 	//--------------------------------------------------------------------------
 	/**
 	 * Description, events, exceptions, example
-	 * @name Container#test
-	 * @function
+	 * @static
+	 * @memberOf Container
 	 * @return true on pass, false on fail
 	 * @type boolean
 	 */
-	test: function () {
-		var _type = Core._("Helpers.Type");
+	var test = function () {
 		var c1 = Core._("Container");
 		var c2 = Core._("Container");
 		var c3 = Core._("Container");
@@ -174,8 +164,12 @@ function () {
 		}
 
 		return result;
-	}
-});
+	};
+
+	return {
+		test: test
+	};
+}) ());
 
 
 

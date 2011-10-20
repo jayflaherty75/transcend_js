@@ -1,23 +1,35 @@
 //-----------------------------------------------------------------------------
 /**
- * @fileoverview Description, required classes, examples
- * 	<br /><br />
+ * @fileoverview Description, required classes, examples<br /><br />
  * 
- * Copyright	&copy; 2011 {@link http://www.jasonkflaherty.com Jason K. Flaherty}<br />
- * @author		{@link http://www.jasonkflaherty.com Jason K. Flaherty}
- * 				{@link mailto:coderx75@hotmail.com coderx75@hotmail.com}
+ * Copyright &copy; 2011 
+ * <a href="http://www.jasonkflaherty.com" target="_blank">Jason K. Flaherty</a>
+ * (<a href="mailto:coderx75@hotmail.com">E-mail</a>)<br />
+ * @author Jason K. Flaherty
  */
 
-/*---------------------------------------------------------------------------*/
-Core._("Helpers").register ("Type", new (Class.create ({
-	initialize: function () {
-		var _toString = Object.prototype.toString;
+//-----------------------------------------------------------------------------
+Core._("Helpers").register ("Type", (function () {
+	var _type = Core._("Helpers.Type");
+	var _toString = Object.prototype.toString;
+	var TypeHelpers;
 
+	/**
+	 * @namespace Description
+	 */
+	TypeHelpers = {
 		//---------------------------------------------------------------------
-		//Types returned are all capitalized.  Value's classRef() Property, 
-		//model's className(), Number, String, Boolean, Object, Undefined, 
-		//String, Array, Element or NUll.
-		this.getType = function (value) {
+		/**
+		 * Types returned are all capitalized.  Value's classRef() Property, 
+		 * model's className(), Number, String, Boolean, Object, Undefined, 
+		 * String, Array, Element or NUll.
+		 * @memberOf TypeHelpers
+		 * @function
+		 * @param {mixed} value Description
+		 * @return Description
+		 * @type boolean
+		 */
+		getType: function (value) {
 			if (typeof (value.model) == "undefined") {
 				var type = typeof (value);
 
@@ -36,67 +48,187 @@ Core._("Helpers").register ("Type", new (Class.create ({
 			else {
 				return value.model.className();
 			}
-		}.bind (this);
+		},
 
-		this.isObject = function (object) {
+		//---------------------------------------------------------------------
+		/**
+		 * Description, events, exceptions, example
+		 * @memberOf TypeHelpers
+		 * @function
+		 * @param {mixed} object Description
+		 * @return Description
+		 * @type boolean
+		 */
+		isObject: function (object) {
 			return _toString.call(object) == "[object Object]";
-		};
+		},
 
-		this.isElement = function (object) {
+		//---------------------------------------------------------------------
+		/**
+		 * Description, events, exceptions, example
+		 * @memberOf TypeHelpers
+		 * @function
+		 * @param {mixed} object Description
+		 * @return Description
+		 * @type boolean
+		 */
+		isElement: function (object) {
 			return !!(object && object.nodeType == 1);
-		};
+		},
 
-		this.isArray = function (object) {
+		//---------------------------------------------------------------------
+		/**
+		 * Description, events, exceptions, example
+		 * @memberOf TypeHelpers
+		 * @function
+		 * @param {mixed} object Description
+		 * @return Description
+		 * @type boolean
+		 */
+		isArray: function (object) {
 			return _toString.call(object) == "[object Array]";
-		};
+		},
 
-		this.isFunction = function (object) {
+		//---------------------------------------------------------------------
+		/**
+		 * Description, events, exceptions, example
+		 * @memberOf TypeHelpers
+		 * @function
+		 * @param {mixed} object Description
+		 * @return Description
+		 * @type boolean
+		 */
+		isFunction: function (object) {
 			return typeof object == "function";
-		};
+		},
 
-		this.isString = function (object) {
+		//---------------------------------------------------------------------
+		/**
+		 * Description, events, exceptions, example
+		 * @memberOf TypeHelpers
+		 * @function
+		 * @param {mixed} object Description
+		 * @return Description
+		 * @type boolean
+		 */
+		isString: function (object) {
 			return _toString.call(object) == "[object String]";
-		};
+		},
 
-		this.isNumber = function (object) {
+		//---------------------------------------------------------------------
+		/**
+		 * Description, events, exceptions, example
+		 * @memberOf TypeHelpers
+		 * @function
+		 * @param {mixed} object Description
+		 * @return Description
+		 * @type boolean
+		 */
+		isNumber: function (object) {
 			return _toString.call(object) == "[object Number]";
-		};
+		},
 
-		this.isBoolean = function (object) {
+		//---------------------------------------------------------------------
+		/**
+		 * Description, events, exceptions, example
+		 * @memberOf TypeHelpers
+		 * @function
+		 * @param {mixed} object Description
+		 * @return Description
+		 * @type boolean
+		 */
+		isBoolean: function (object) {
 			return typeof object == "boolean";
-		};
+		},
 
-		this.isNull = function (object) {
+		//---------------------------------------------------------------------
+		/**
+		 * Description, events, exceptions, example
+		 * @memberOf TypeHelpers
+		 * @function
+		 * @param {mixed} object Description
+		 * @return Description
+		 * @type boolean
+		 */
+		isNull: function (object) {
 			return object == null;
-		};
+		},
 
-		this.isUndefined = function (object) {
+		//---------------------------------------------------------------------
+		/**
+		 * Description, events, exceptions, example
+		 * @memberOf TypeHelpers
+		 * @function
+		 * @param {mixed} object Description
+		 * @return Description
+		 * @type boolean
+		 */
+		isUndefined: function (object) {
 			return typeof object == "undefined";
-		};
+		},
 
-		this.isDefined = function (object) {
+		//---------------------------------------------------------------------
+		/**
+		 * Description, events, exceptions, example
+		 * @memberOf TypeHelpers
+		 * @function
+		 * @param {mixed} object Description
+		 * @return Description
+		 * @type boolean
+		 */
+		isDefined: function (object) {
 			return typeof object != "undefined";
-		};
+		},
 
-		this.is = function (type, object) {
+		//---------------------------------------------------------------------
+		/**
+		 * Description, events, exceptions, example
+		 * @memberOf TypeHelpers
+		 * @function
+		 * @param {String} type Description
+		 * @param {mixed} object Description
+		 * @return Description
+		 * @type boolean
+		 */
+		is: function (type, object) {
 			return this.getType (object) == type;
-		};
+		},
 
-		this.toArray = function (object) {
+		//---------------------------------------------------------------------
+		/**
+		 * Description, events, exceptions, example
+		 * @memberOf TypeHelpers
+		 * @function
+		 * @param {mixed} object Description
+		 * @return Description
+		 * @type Array
+		 */
+		toArray: function (object) {
 			if (!object) return [];
 			if ('toArray' in Object(object)) return object.toArray();
 			var length = object.length || 0, results = new Array(length);
 			while (length--) results[length] = object[length];
 			return results;
-		};
+		},
 
-		this.toString = function (object) {
+		//---------------------------------------------------------------------
+		/**
+		 * Description, events, exceptions, example
+		 * @memberOf TypeHelpers
+		 * @function
+		 * @param {mixed} object Description
+		 * @return Description
+		 * @type String
+		 */
+		toString: function (object) {
 			if (this.isString (object)) return object;
 			if (!this.isUndefined (object.toString)) return object.toString ();
 			return String (object);
-		};
+		}
+	};
 
-		this._ = this.getType;
-	}
-})) ());
+	TypeHelpers._ = TypeHelpers.getType;
+
+	return TypeHelpers;
+}) ());
 

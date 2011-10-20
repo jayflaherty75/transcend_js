@@ -4,62 +4,46 @@
  * 	logic for rendering a module.  This class may directly render the page or
  * 	make use of {@link Template} objects.<br /><br />
  * 
- * 	Copyright	&copy; 2011 {@link http://www.jasonkflaherty.com Jason K. Flaherty}<br />
- * 	Bugs<br />
- * @author		{@link http://www.jasonkflaherty.com Jason K. Flaherty}
- * 				{@link mailto:coderx75@hotmail.com coderx75@hotmail.com}
+ * Copyright &copy; 2011 
+ * <a href="http://www.jasonkflaherty.com" target="_blank">Jason K. Flaherty</a>
+ * (<a href="mailto:coderx75@hotmail.com">E-mail</a>)<br />
+ * @author Jason K. Flaherty
  */
 
 //-----------------------------------------------------------------------------
-Core.extend ("View", "Container", /** @lends View */ (function () {
-	/**
-	 * @class View class that may be extended to a child class containing
-	 * 	logic for rendering a module.
-	 * @constructs
-	 */
-	var oninit =  function () {
-		this.engine = Core._("Property");
+Core.extend ("View", "Container", (function () {
+	var View = /** @lends View.prototype */ {
+		/**
+		 * @class View class that may be extended to a child class containing
+		 * 	logic for rendering a module.
+		 * @extends Container
+		 * @constructs
+		 */
+		oninit: function () {
+			this.engine = Core._("Property");
+		},
+
+		//---------------------------------------------------------------------
+		/**
+		 * Calls <i>onprerender()</i>, <i>onrender()</i> and <i>onpostrender()</i>
+		 * of the View instance.
+		 * @name View#render
+		 * @function
+		 * @return Returns any data returned by the <i>onrender()</i> handler.
+		 * @type Any
+		 */
+		render: function (parent) {
+			var result;
+			if (Object.isFunction (this.onprerender)) this.onprerender (parent);
+			if (Object.isFunction (this.onrender))
+				result = this.onrender (parent);
+			if (Object.isFunction (this.onpostrender))
+				result = this.onpostrender (result);
+	
+			return result;
+		}
 	};
 
-	//-------------------------------------------------------------------------
-	/**
-	 * For views utilizing templates, returns the template.
-	 * @name View#getEngine
-	 * @function
-	 * @return Returns the Template object being used by the View
-	 * @type Template
-	 */
-	//var get_engine = function () {
-	//	if (Object.isFunction (this.onengine))
-	//		return this.onengine ();
-	//	else
-	//		return null;
-	//};
-
-	//-------------------------------------------------------------------------
-	/**
-	 * Calls <i>onprerender()</i>, <i>onrender()</i> and <i>onpostrender()</i>
-	 * of the View instance.
-	 * @name View#render
-	 * @function
-	 * @return Returns any data returned by the <i>onrender()</i> handler.
-	 * @type Any
-	 */
-	var render = function (parent) {
-		var result;
-		if (Object.isFunction (this.onprerender)) this.onprerender (parent);
-		if (Object.isFunction (this.onrender))
-			result = this.onrender (parent);
-		if (Object.isFunction (this.onpostrender))
-			result = this.onpostrender (result);
-
-		return result;
-	};
-
-	return {
-		oninit: oninit,
-		//getEngine: get_engine,
-		render: render
-	};
+	return View;
 }) ());
 

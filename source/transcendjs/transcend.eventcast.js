@@ -8,12 +8,14 @@
  * targets.  Multiple Eventcasts may be assigned to the same target event.
  * Once created, other modules may then "listen" in on the Eventcast.<br /><br />
  * 
- * 	Copyright	&copy; 2011 {@link http://www.jasonkflaherty.com Jason K. Flaherty}<br />
- * @author		Jason K. Flaherty coderx75@hotmail.com
+ * Copyright &copy; 2011 
+ * <a href="http://www.jasonkflaherty.com" target="_blank">Jason K. Flaherty</a>
+ * (<a href="mailto:coderx75@hotmail.com">E-mail</a>)<br />
+ * @author Jason K. Flaherty
  */
 
 //-----------------------------------------------------------------------------
-Core.extend ("Eventcast", "Multicast", /** @lends Eventcast# */ {
+Core.extend ("Eventcast", "Multicast", /** @lends Eventcast */ {
 	/**
 	 * @class Manages a type of event for a group of target objects and allows 
 	 * 	external code to "listen" for that event from any of the targets.  
@@ -36,6 +38,7 @@ Core.extend ("Eventcast", "Multicast", /** @lends Eventcast# */ {
 		$super ();
 
 		var _type = Core._("Helpers.Type");
+		var _event = Core._("Helpers.Event");
 		var pvt = {
 			targets: {},
 			mcast_listen: this.listen.bind (this),
@@ -59,7 +62,7 @@ Core.extend ("Eventcast", "Multicast", /** @lends Eventcast# */ {
 		var multi_handler = function () {
 			var args = $A(arguments);
 
-			if (!Event.isEvent (args[0])) args.unshift (window.event || { clientX: 0 });
+			if (!_event.isEvent (args[0])) args.unshift (window.event || { clientX: 0 });
 
 			args[0]["memo"] = memo;
 			args[0]["tn_type"] = event_name;
@@ -294,7 +297,7 @@ Core.extend ("Eventcast", "Multicast", /** @lends Eventcast# */ {
 	/**
 	 * Static. Adds a listener function to an object event.  Creates an 
 	 * Eventcast object if none are present. 
-	 * @name Eventcast#listen
+	 * @memberOf Eventcast
 	 * @function
 	 * @param {object} object Target object or array of targets to listen to
 	 * @param {string} event_name Event identifier
@@ -327,7 +330,7 @@ Core.extend ("Eventcast", "Multicast", /** @lends Eventcast# */ {
 	/**
 	 * Static. Returns the Eventcast instance associated with a given
 	 * object and event type
-	 * @name Eventcast#get
+	 * @memberOf Eventcast
 	 * @function
 	 * @param {object} object Target object or array of targets to listen to
 	 * @param {string} event_name Event identifier

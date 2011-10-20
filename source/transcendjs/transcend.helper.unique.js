@@ -1,27 +1,56 @@
 //-----------------------------------------------------------------------------
 /**
- * @fileoverview Description, required classes, examples
- * 	<br /><br />
+ * @fileoverview Description, required classes, examples<br /><br />
  * 
- * Copyright	&copy; 2011 {@link http://www.jasonkflaherty.com Jason K. Flaherty}<br />
- * @author		{@link http://www.jasonkflaherty.com Jason K. Flaherty}
- * 				{@link mailto:coderx75@hotmail.com coderx75@hotmail.com}
+ * Copyright &copy; 2011 
+ * <a href="http://www.jasonkflaherty.com" target="_blank">Jason K. Flaherty</a>
+ * (<a href="mailto:coderx75@hotmail.com">E-mail</a>)<br />
+ * @author Jason K. Flaherty
  */
 
-/*---------------------------------------------------------------------------*/
-Core._("Helpers").register ("Unique", new (Class.create ({
-	initialize: function () {
-		var uid = Math.floor (Math.random () * 256);
+//-----------------------------------------------------------------------------
+Core._("Helpers").register ("Unique", (function () {
+	var _type = Core._("Helpers.Type");
+	var uid = Math.floor (Math.random () * 256);
+	var UniqueHelpers;
 
-		this.simple = function () {
+	/**
+	 * @namespace Description
+	 */
+	UniqueHelpers = {
+		//---------------------------------------------------------------------
+		/**
+		 * Description, events, exceptions, example
+		 * @memberOf UniqueHelpers
+		 * @function
+		 * @return Description
+		 * @type number
+		 */
+		simple: function () {
 			return ++uid;
-		};
+		},
 
-		this.hex = function () {
+		//---------------------------------------------------------------------
+		/**
+		 * Description, events, exceptions, example
+		 * @memberOf UniqueHelpers
+		 * @function
+		 * @return Description
+		 * @type String
+		 */
+		hex: function () {
 			return "h" + Core._("Helpers.View").formatHex (this.simple (), 8);
-		};
+		},
 
-		this.global = function () {
+		//---------------------------------------------------------------------
+		/**
+		 * Description, events, exceptions, example
+		 * @memberOf UniqueHelpers
+		 * @function
+		 * @return Description
+		 * @type String
+		 */
+		global: function () {
 			if (__SYSTEM_USERADDRESS__) {
 				var format_hex = Core._("Helpers.View").formatHex;
 				var d = new Date ();
@@ -47,9 +76,11 @@ Core._("Helpers").register ("Unique", new (Class.create ({
 			else {
 				return false;
 			}
-		}.bind (this);
+		}
+	};
 
-		this._ = this.global;
-	}
-})) ());
+	UniqueHelpers._ = UniqueHelpers.global;
+
+	return UniqueHelpers;
+}) ());
 

@@ -2,22 +2,78 @@
 /**
  * @fileoverview Description, required classes, examples<br/><br/>
  * 
- * 	Copyright	&copy; 2011 {@link http://www.jasonkflaherty.com Jason K. Flaherty}<br />
- * @author		{@link http://www.jasonkflaherty.com Jason K. Flaherty}
- * 				{@link mailto:coderx75@hotmail.com coderx75@hotmail.com}
+ * Copyright &copy; 2011 
+ * <a href="http://www.jasonkflaherty.com" target="_blank">Jason K. Flaherty</a>
+ * (<a href="mailto:coderx75@hotmail.com">E-mail</a>)<br />
+ * @author Jason K. Flaherty
  */
 
 //-----------------------------------------------------------------------------
-Core.extend ("NodeContext", "Context", /** @lends NodeContext */ (function () {
-	/**
-	 * @class Description
-	 */
+Core.extend ("NodeContext", "Context", (function () {
 	var _type = Core._("Helpers.Type");
+	var process_data, write_data, copy_data, save_node, _default;
+	var apply_attributes, apply_style, text;
 
-	//--------------------------------------------------------------------
+	var NodeContext = /** @lends NodeContext.prototype */ {
+		//---------------------------------------------------------------------
+		/**
+		 * @class Description
+		 * @extends Context
+		 * @constructs
+		 * @param {any} data Collection or data structure to be iterated
+		 */
+		oninit: function () {
+			this.register ("_default", _default);
+			this.register ("apply-attributes", apply_attributes);
+			this.register ("apply-style", apply_style);
+			this.register ("text", text);
+		},
+
+		//---------------------------------------------------------------------
+		/**
+		 * Description, events, exceptions, example
+		 * @name NodeContext#onstart
+		 * @function
+		 * @param {type} code Description
+		 * @return Description
+		 * @type Boolean
+		 */
+		onstart: function (code) {
+			var state = this.get ("_state");
+
+			if (_type.isDefined (state)) {
+				state["x"] = {};
+				return true;
+			}
+
+			return false;
+		},
+
+		//---------------------------------------------------------------------
+		/**
+		 * Description, events, exceptions, example
+		 * @name NodeContext#oncomplete
+		 * @function
+		 * @param {Boolean} result Description
+		 * @return Description
+		 * @type Object|false
+		 */
+		oncomplete: function (result) {
+			var state = this.get ("_state");
+
+			if (_type.isDefined (state)) {
+				return state.x;
+			}
+
+			return false;
+		}
+	};
+
+	//-------------------------------------------------------------------------
 	/**
-	 * Private. Description, events, exceptions, example
+	 * Description, events, exceptions, example
 	 * @name NodeContext#process_data
+	 * @private
 	 * @function
 	 * @param {Interpreter} interpreter Description
 	 * @param {String} id Description
@@ -25,7 +81,7 @@ Core.extend ("NodeContext", "Context", /** @lends NodeContext */ (function () {
 	 * @return Description
 	 * @type mixed
 	 */
-	var process_data = function (interpreter, id, params) {
+	process_data = function (interpreter, id, params) {
 		var data = interpreter.get (id);
 
 		if (_type.isDefined (data)) {
@@ -53,15 +109,16 @@ Core.extend ("NodeContext", "Context", /** @lends NodeContext */ (function () {
 		return data;
 	};
 
-	//--------------------------------------------------------------------
+	//-------------------------------------------------------------------------
 	/**
-	 * Private. Description, events, exceptions, example
+	 * Description, events, exceptions, example
 	 * @name NodeContext#write_data
+	 * @private
 	 * @function
 	 * @param {mixed} node Description
 	 * @param {mixed} data Description
 	 */
-	var write_data = function (node, data) {
+	write_data = function (node, data) {
 		if (!_type.isObject (data)) {
 			if (_type.isFunction (data)) {
 				node.append (node.model.getInstance ("text", data ()));
@@ -72,16 +129,17 @@ Core.extend ("NodeContext", "Context", /** @lends NodeContext */ (function () {
 		}
 	};
 
-	//--------------------------------------------------------------------
+	//-------------------------------------------------------------------------
 	/**
-	 * Private. Description, events, exceptions, example
+	 * Description, events, exceptions, example
 	 * @name NodeContext#copy_data
+	 * @private
 	 * @function
 	 * @param {mixed} data Description
 	 * @return Description
 	 * @type Object
 	 */
-	var copy_data = function (data) {
+	copy_data = function (data) {
 		var object = {};
 
 		for (key in data) {
@@ -94,16 +152,17 @@ Core.extend ("NodeContext", "Context", /** @lends NodeContext */ (function () {
 		return object;
 	};
 
-	//--------------------------------------------------------------------
+	//-------------------------------------------------------------------------
 	/**
-	 * Private. Description, events, exceptions, example
+	 * Description, events, exceptions, example
 	 * @name NodeContext#save_node
+	 * @private
 	 * @function
 	 * @param {Object} set Description
 	 * @param {String} id Description
 	 * @param {mixed} node Description
 	 */
-	var save_node = function (set, id, node) {
+	save_node = function (set, id, node) {
 		var current = set[id];
 
 		if (_type.isUndefined (current)) 
@@ -115,49 +174,11 @@ Core.extend ("NodeContext", "Context", /** @lends NodeContext */ (function () {
 		}
 	};
 
-	//--------------------------------------------------------------------
+	//-------------------------------------------------------------------------
 	/**
 	 * Description, events, exceptions, example
-	 * @name NodeContext#onstart
-	 * @function
-	 * @param {type} code Description
-	 * @return Description
-	 * @type Boolean
-	 */
-	var onstart = function (code) {
-		var state = this.get ("_state");
-
-		if (_type.isDefined (state)) {
-			state["x"] = {};
-			return true;
-		}
-
-		return false;
-	};
-
-	//--------------------------------------------------------------------
-	/**
-	 * Description, events, exceptions, example
-	 * @name NodeContext#oncomplete
-	 * @function
-	 * @param {Boolean} result Description
-	 * @return Description
-	 * @type Object|false
-	 */
-	var oncomplete = function (result) {
-		var state = this.get ("_state");
-
-		if (_type.isDefined (state)) {
-			return state.x;
-		}
-
-		return false;
-	};
-
-	//--------------------------------------------------------------------
-	/**
-	 * Private. Description, events, exceptions, example
-	 * @name NodeContext#oncomplete
+	 * @name NodeContext#_default
+	 * @private
 	 * @function
 	 * @param {String} id Description
 	 * @param {Object} params Description
@@ -165,7 +186,7 @@ Core.extend ("NodeContext", "Context", /** @lends NodeContext */ (function () {
 	 * @return Description
 	 * @type Boolean
 	 */
-	var _default = function (id, params, nodes) {
+	_default = function (id, params, nodes) {
 		var state = this.get ("_state");
 		var model = this.model ();
 		var parent = state["a"];
@@ -201,17 +222,18 @@ Core.extend ("NodeContext", "Context", /** @lends NodeContext */ (function () {
 		return result;
 	};
 
-	//--------------------------------------------------------------------
+	//-------------------------------------------------------------------------
 	/**
-	 * Private. Description, events, exceptions, example
+	 * Description, events, exceptions, example
 	 * @name NodeContext#apply_attributes
+	 * @private
 	 * @function
 	 * @param {String} id Description
 	 * @param {Object} params Description
 	 * @return Description
 	 * @type Boolean
 	 */
-	var apply_attributes = function (id, params) {
+	apply_attributes = function (id, params) {
 		var state = this.get ("_state");
 		var parent = state["a"];
 		var data = copy_data (this.get (params["id"]));
@@ -221,17 +243,18 @@ Core.extend ("NodeContext", "Context", /** @lends NodeContext */ (function () {
 		return true;
 	};
 
-	//--------------------------------------------------------------------
+	//-------------------------------------------------------------------------
 	/**
-	 * Private. Description, events, exceptions, example
+	 * Description, events, exceptions, example
 	 * @name NodeContext#apply_style
+	 * @private
 	 * @function
 	 * @param {String} id Description
 	 * @param {Object} params Description
 	 * @return Description
 	 * @type Boolean
 	 */
-	var apply_style = function (id, params) {
+	apply_style = function (id, params) {
 		var state = this.get ("_state");
 		var parent = state["a"];
 
@@ -242,17 +265,18 @@ Core.extend ("NodeContext", "Context", /** @lends NodeContext */ (function () {
 		return true;
 	};
 
-	//--------------------------------------------------------------------
+	//-------------------------------------------------------------------------
 	/**
-	 * Private. Description, events, exceptions, example
+	 * Description, events, exceptions, example
 	 * @name NodeContext#text
+	 * @private
 	 * @function
 	 * @param {String} id Description
 	 * @param {Object} params Description
 	 * @return Description
 	 * @type Boolean
 	 */
-	var text = function (id, params) {
+	text = function (id, params) {
 		var state = this.get ("_state");
 		var model = this.model ();
 		var parent = state["a"];
@@ -266,22 +290,6 @@ Core.extend ("NodeContext", "Context", /** @lends NodeContext */ (function () {
 		return true;
 	};
 
-	//--------------------------------------------------------------------
-	/**
-	 * @constructs
-	 * @param {any} data Collection or data structure to be iterated
-	 */
-	var oninit = function () {
-		this.register ("_default", _default);
-		this.register ("apply-attributes", apply_attributes);
-		this.register ("apply-style", apply_style);
-		this.register ("text", text);
-	};
-
-	return {
-		oninit: oninit,
-		onstart: onstart,
-		oncomplete: oncomplete
-	};
+	return NodeContext;
 }) ());
 
