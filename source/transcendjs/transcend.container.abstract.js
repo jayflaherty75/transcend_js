@@ -174,7 +174,7 @@ Core.register ("ContainerAbstract", (function () {
 	/**
 	 * Traverses a chain of containers and returns the container that contains
 	 * the given key.
-	 * @name ContainerAbstract#_find_key
+	 * @memberOf ContainerAbstract.prototype
 	 * @function
 	 * @private
 	 * @param {Container} container

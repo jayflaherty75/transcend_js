@@ -11,7 +11,7 @@
 //-----------------------------------------------------------------------------
 Core.extend ("TransportController", "Controller", (function () {
 	var _type = Core._("Helpers.Type");
-	var send_action;
+	var _send_action;
 
 	var TransportController = /** @lends TransportController.prototype */ {
 		//---------------------------------------------------------------------
@@ -37,20 +37,21 @@ Core.extend ("TransportController", "Controller", (function () {
 			 */
 			this.debug = Core._("Property");
 
-			this.register ("send", send_action);
+			this.register ("send", _send_action);
 		}
 	};
 
 	//-------------------------------------------------------------------------
 	/**
 	 * Description, events, exceptions, example
-	 * @name TransportController#$send
+	 * @memberOf TransportController.prototype
 	 * @function
+	 * @private
 	 * @param {Event} event Description
 	 * @param {mixed} message Description
 	 * @param {Function} handler Description
 	 */
-	send_action = function (event, message, handler) {
+	_send_action = function (event, message, handler) {
 		if (_type.isFunction (this.onsend)) {
 			this.onsend (message, handler);
 		}

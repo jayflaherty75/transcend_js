@@ -80,7 +80,7 @@ Core.extend ("XmlRpcController", "TransportController", (function () {
 	//-------------------------------------------------------------------------
 	/**
 	 * Description, events, exceptions, example
-	 * @name XmlRpcController#_debug_onchange
+	 * @memberOf XmlRpcController.prototype
 	 * @function
 	 * @private
 	 * @param {mixed} newval Description

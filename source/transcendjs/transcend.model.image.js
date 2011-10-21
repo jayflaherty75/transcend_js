@@ -9,19 +9,23 @@
  */
 
 //-----------------------------------------------------------------------------
-Core.extend ("ImageModel", "ModelAbstract", /** @lends ImageModel */ {
-	/**
-	 * @class Simple model for seemlessly integrating DOM Images
-	 * @extends ModelAbstract
-	 * @constructs
-	 */
-	oninit: function () {
-		this.className ("Image");
-		this.defaultIterator (null);
-	},
+Core.extend ("ImageModel", "ModelAbstract", (function () {
+	var ImageModel = /** @lends ImageModel.prototype */ {
+		/**
+		 * @class Simple model for seemlessly integrating DOM Images
+		 * @extends ModelAbstract
+		 * @constructs
+		 */
+		oninit: function () {
+			this.className ("Image");
+			this.defaultIterator (null);
+		},
 
-	oncreate: function (image) {
-		return image || new Image ();
-	}
-});
+		oncreate: function (image) {
+			return image || new Image ();
+		}
+	};
+
+	return ImageModel;
+}) ());
 

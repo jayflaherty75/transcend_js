@@ -15,110 +15,79 @@
  */
 
 //-----------------------------------------------------------------------------
-Core.extend ("Eventcast", "Multicast", /** @lends Eventcast */ {
-	/**
-	 * @class Manages a type of event for a group of target objects and allows 
-	 * 	external code to "listen" for that event from any of the targets.  
-	 * 	Eventcasts may multiple targets and multiple listeners, making it a 
-	 * 	many-to-one-to-many design.  Targets may have separate Eventcasts for 
-	 * 	each event but may also have multiple Eventcasts of the same event, 
-	 * 	allowing for any configuration and for very complex interactions to be 
-	 * 	easily implemented.<br /><br />
-	 * 
-	 * 	Hook-in function is only set if there are targets and listeners for the
-	 * 	Eventcast.  No resources are wasted on empty calls.<br /><br />
-	 * @extends Multicast
-	 * @constructs
-	 * @param {string} event_name Name of event to cast
-	 * @param {any} memo Miscellaneous data to be passed along with event
-	 * @param {object} targets Any number of target object parameters (optional)
-	 * @return Eventcast
-	 */
-	initialize: function ($super, event_name, memo) {
-		$super ();
+Core.extend ("Eventcast", "Multicast", (function () {
+	var _type = Core._("Helpers.Type");
+	var _event = Core._("Helpers.Event");
+	var _parent = Core.getClass ("Multicast");
+	var multi_handler, add_handler, remove_handler;
 
-		var _type = Core._("Helpers.Type");
-		var _event = Core._("Helpers.Event");
-		var pvt = {
-			targets: {},
-			mcast_listen: this.listen.bind (this),
-			mcast_ignore: this.ignore.bind (this),
-			self: this
-		};
-
-		//---------------------------------------------------------------------
+	var Eventcast = /** @lends Eventcast.prototype */ {
 		/**
-		 * Handler function to be assigned to object's hook-in.  This calls
-		 * <i>Multicast.call()</i> method along with event parameters sent
-		 * by target object.
-		 * @name Eventcast#multi_handler
-		 * @function
-		 * @param {...} Anything the original object sent
-		 * @return Any value passed back to target by the listener (or Array 
-		 * 		of values)
-		 * @type object
-		 * @private
+		 * @class Manages a type of event for a group of target objects and allows 
+		 * 	external code to "listen" for that event from any of the targets.  
+		 * 	Eventcasts may multiple targets and multiple listeners, making it a 
+		 * 	many-to-one-to-many design.  Targets may have separate Eventcasts for 
+		 * 	each event but may also have multiple Eventcasts of the same event, 
+		 * 	allowing for any configuration and for very complex interactions to be 
+		 * 	easily implemented.<br /><br />
+		 * 
+		 * 	Hook-in function is only set if there are targets and listeners for the
+		 * 	Eventcast.  No resources are wasted on empty calls.<br /><br />
+		 * @extends Multicast
+		 * @constructs
+		 * @param {string} event_name Name of event to cast
+		 * @param {any} memo Miscellaneous data to be passed along with event
+		 * @param {object} targets Any number of target object parameters (optional)
+		 * @return Eventcast
 		 */
-		var multi_handler = function () {
-			var args = $A(arguments);
+		initialize: function ($super, event_name, memo) {
+			$super ();
 
-			if (!_event.isEvent (args[0])) args.unshift (window.event || { clientX: 0 });
+			var pvt = {
+				targets: {},
+				mcast_listen: _parent.prototype.listen.bind (this),
+				mcast_ignore: _parent.prototype.ignore.bind (this),
+				self: this
+			};
 
-			args[0]["memo"] = memo;
-			args[0]["tn_type"] = event_name;
-			args[0]["tn_target"] = this;
+			this._event_name = event_name;
+			this._memo = memo;
+			this._pvt = pvt;
 
-			return (pvt.self.call.apply (pvt.self, args));
-		};
+			//---------------------------------------------------------------------
+			/**
+			 * Handler function to be assigned to object's hook-in.  This calls
+			 * <i>Multicast.call()</i> method along with event parameters sent
+			 * by target object.
+			 * @memberOf Eventcast
+			 * @private
+			 * @function
+			 * @param {...} Anything the original object sent
+			 * @return Any value passed back to target by the listener (or Array 
+			 * 		of values)
+			 * @type object
+			 * @private
+			 */
+			multi_handler = function () {
+				var args = $A(arguments);
 
-		//---------------------------------------------------------------------
-		/**
-		 * Adds Eventcast function to target hook-in
-		 * @name Eventcast#add_handler
-		 * @function
-		 * @param {object} target
-		 * @return Function added to Eventcast hook-in.
-		 * @type function
-		 * @private
-		 */
-		var add_handler = function (target) {
-			var mcast_func = multi_handler.bind (target);
-			var funcname = "on" + event_name;
-			var func = null;
-			var mcast;
+				if (!_event.isEvent (args[0])) args.unshift (window.event || { clientX: 0 });
 
-			if (Object.isFunction  (target[funcname])) {
-				mcast = Core._("Multicast", mcast_func, target[funcname]);
-				func = mcast.call.bind (mcast);
+				args[0]["memo"] = pvt.self._memo;
+				args[0]["tn_type"] = event_name;
+				args[0]["tn_target"] = this;
+
+				return (pvt.self.call.apply (pvt.self, args));
+			};
+
+			//---------------------------------------------------------------------
+			for (i = 3; i < arguments.length; i++) {
+				var targets = arguments[i];
+	
+				if (typeof (targets) != "undefined")
+					this.add (targets);
 			}
-			else {
-				func = mcast_func;
-			}
-
-			target[funcname] = Object.extend (func, { multicast: mcast });
-
-			return mcast_func;
-		};
-
-		//---------------------------------------------------------------------
-		/**
-		 * Removes Eventcast function from target hook-in
-		 * @name Eventcast#remove_handler
-		 * @function
-		 * @param {object} target
-		 * @param {function} func
-		 * @private
-		 */
-		var remove_handler = function (target, func) {
-			var funcname = "on" + event_name;
-
-			if (Object.isFunction  (target[funcname])) {
-				if (target[funcname].multicast)
-					if (func) func.ignore ();
-				else
-					if (target[funcname] == func) delete target[funcname];
-			}
-		};
+		},
 
 		//---------------------------------------------------------------------
 		/**
@@ -128,9 +97,9 @@ Core.extend ("Eventcast", "Multicast", /** @lends Eventcast */ {
 		 * @return Name of event type
 		 * @type string
 		 */
-		this.getType = function () {
-			return event_name;
-		};
+		getType: function () {
+			return this._event_name;
+		},
 
 		//---------------------------------------------------------------------
 		/**
@@ -141,10 +110,10 @@ Core.extend ("Eventcast", "Multicast", /** @lends Eventcast */ {
 		 * @return Returns "this" instance for use in chain calls.
 		 * @type Eventcast
 		 */
-		this.setMemo = function (new_memo) {
-			memo = new_memo;
+		setMemo: function (new_memo) {
+			this._memo = new_memo;
 			return this;
-		};
+		},
 
 		//---------------------------------------------------------------------
 		/**
@@ -157,7 +126,7 @@ Core.extend ("Eventcast", "Multicast", /** @lends Eventcast */ {
 		 * @return Returns Eventcast object for chain calls
 		 * @type Eventcast
 		 */
-		this.add = function () {
+		add: function () {
 			var uid, events, func = null;
 
 			for (i = 0; i < arguments.length; i++) {
@@ -183,18 +152,18 @@ Core.extend ("Eventcast", "Multicast", /** @lends Eventcast */ {
 							target["_events"] = events;
 						}
 
-						if (_type.isUndefined (events[event_name]))
-							events[event_name] = this;
+						if (_type.isUndefined (events[this._event_name]))
+							events[this._event_name] = this;
 
-						if (this.count () > 0) func = add_handler (target);
+						if (this.count () > 0) func = add_handler.apply (this, [target]);
 
-						pvt.targets[uid] = ({ "target": target, "func": func });
+						this._pvt.targets[uid] = ({ "target": target, "func": func });
 					}
 				}
 			}
 
 			return this;
-		};
+		},
 
 		//---------------------------------------------------------------------
 		/**
@@ -206,11 +175,11 @@ Core.extend ("Eventcast", "Multicast", /** @lends Eventcast */ {
 		 * @return Returns Eventcast object for chain calls
 		 * @type Eventcast
 		 */
-		this.remove = function (target) {
+		remove: function (target) {
 			//TODO: allow multiple arguments and arrays of objects (see add())
 			if (typeof (target) == "object") {
-				remove_handler (target, pvt.targets[target._bcast_id].func);
-				delete pvt.targets[target._bcast_id];
+				remove_handler.apply (this, [target, this._pvt.targets[target._bcast_id].func]);
+				delete this._pvt.targets[target._bcast_id];
 			}
 			else {
 				throw new TypeError ("Eventcast.remove(): Parameter 1 " +
@@ -218,7 +187,7 @@ Core.extend ("Eventcast", "Multicast", /** @lends Eventcast */ {
 			}
 
 			return this;
-		};
+		},
 
 		//---------------------------------------------------------------------
 		/**
@@ -232,17 +201,17 @@ Core.extend ("Eventcast", "Multicast", /** @lends Eventcast */ {
 		 * @return Same as <i>Multicast.listen()</i>
 		 * @type object
 		 */
-		this.listen = function (listener) {
+		listen: function (listener) {
 			var _add_handler = add_handler;
 
 			if (this.count () == 0 && Object.isFunction (listener)) {
-				$H(pvt.targets).each (function (pairs) {
-					pairs.value.func = _add_handler (pairs.value.target);
+				$H(this._pvt.targets).each (function (pairs) {
+					pairs.value.func = _add_handler.apply (this, [pairs.value.target]);
 				}.bind (this));
 			}
 
-			return pvt.mcast_listen (listener);
-		};
+			return this._pvt.mcast_listen (listener);
+		},
 
 		//---------------------------------------------------------------------
 		/**
@@ -254,17 +223,17 @@ Core.extend ("Eventcast", "Multicast", /** @lends Eventcast */ {
 		 * @return Same as <i>@see Multicast#listen()</i>
 		 * @type object
 		 */
-		this.ignore = function (listener) {
+		ignore: function (listener) {
 			var _remove_handler = remove_handler;	//Carry over upvalues to Hash.each()
-			var _event_name = "on" + event_name;
+			var _event_name = "on" + this._event_name;
 
 			//Last listener, remove handler from targets
 			if (this.count () == 1 && Object.isFunction (listener)) {
-				$H(pvt.targets).each (function (pairs) {
+				$H(this._pvt.targets).each (function (pairs) {
 					var target = pairs.value.target;
 					var func = pairs.value.func;
 
-					_remove_handler (target, func);
+					_remove_handler.apply (this, [target, func]);
 
 					if (Object.isFunction  (target[_event_name])) {
 						if (target[_event_name].multicast) {
@@ -276,18 +245,64 @@ Core.extend ("Eventcast", "Multicast", /** @lends Eventcast */ {
 				}.bind (this));
 			}
 
-			return pvt.mcast_ignore (listener);
-		};
-
-		//---------------------------------------------------------------------
-		for (i = 3; i < arguments.length; i++) {
-			var targets = arguments[i];
-
-			if (typeof (targets) != "undefined")
-				this.add (targets);
+			return this._pvt.mcast_ignore (listener);
 		}
-	}
-}, (function () {
+	};
+
+	//-------------------------------------------------------------------------
+	/**
+	 * Adds Eventcast function to target hook-in
+	 * @memberOf Eventcast.prototype
+	 * @private
+	 * @function
+	 * @param {object} target
+	 * @return Function added to Eventcast hook-in.
+	 * @type function
+	 * @private
+	 */
+	add_handler = function (target) {
+		var mcast_func = multi_handler.bind (target);
+		var funcname = "on" + this._event_name;
+		var func = null;
+		var mcast;
+
+		if (_type.isFunction  (target[funcname])) {
+			mcast = Core._("Multicast", mcast_func, target[funcname]);
+			func = mcast.call.bind (mcast);
+		}
+		else {
+			func = mcast_func;
+		}
+
+		func.multicast = mcast;
+		target[funcname] = func;
+
+		return mcast_func;
+	};
+
+	//-------------------------------------------------------------------------
+	/**
+	 * Removes Eventcast function from target hook-in
+	 * @memberOf Eventcast.prototype
+	 * @private
+	 * @function
+	 * @param {object} target
+	 * @param {function} func
+	 * @private
+	 */
+	remove_handler = function (target, func) {
+		var funcname = "on" + this._event_name;
+
+		if (_type.isFunction  (target[funcname])) {
+			if (target[funcname].multicast)
+				if (func) func.ignore ();
+			else
+				if (target[funcname] == func) delete target[funcname];
+		}
+	};
+
+	return Eventcast;
+}) (), (function () {
 	var _type = Core._("Helpers.Type");
 	var _array = Core._("Helpers.Array");
 	var _eventcast = Core.getClass ("Eventcast");

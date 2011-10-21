@@ -21,7 +21,7 @@
 	var save_instance;
 
 	/**
-	 * @namespace Singleton maintaining all classes, interfaces and singletons 
+ 	 * @namespace Singleton maintaining all classes, interfaces and singletons 
 	 * and provides an interface for registering events and listening for these 
 	 * events without cluttering up the global environment (Core.globalize() 
 	 * makes these globally accessible if preferred).  Initializes the Tech 
@@ -33,7 +33,7 @@
 		 * @name Core#version
 		 * @type Constant
 		 */
-		version: "0.0.22",
+		version: "1.0.0",
 
 		//--------------------------------------------------------------------
 		/**

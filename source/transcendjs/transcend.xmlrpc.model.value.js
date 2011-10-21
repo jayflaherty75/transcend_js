@@ -109,7 +109,7 @@ Core.extend ("XmlRpcValueModel", "ModelAbstract", (function () {
 	//-------------------------------------------------------------------------
 	/**
 	 * Description, events, exceptions, example
-	 * @name XmlRpcValueModel#_get_value
+	 * @memberOf XmlRpcValueModel.prototype
 	 * @function
 	 * @private
 	 * @param {mixed} obj Description

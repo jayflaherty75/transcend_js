@@ -9,50 +9,50 @@
  */
 
 //-----------------------------------------------------------------------------
-Core.extend ("DomIterator", "IteratorAbstract", /** @lends DomIterator */ (function () {
+Core.extend ("DomIterator", "IteratorAbstract", (function () {
 	var _class_name = "Array";
 
-	/**
-	 * @class Generic iterator for operating on child nodes of DOM Elements.
-	 * @extends IteratorAbstract
-	 * @constructs
-	 */
-	var oninit = function () {
-		var _index = 0;
-		var _data = this.data().childNodes;
-		var class_name = "Element";
+	var DomIterator = /** @lends DomIterator.prototype */ {
+		/**
+		 * @class Generic iterator for operating on child nodes of DOM Elements.
+		 * @extends IteratorAbstract
+		 * @constructs
+		 */
+		oninit: function () {
+			var _index = 0;
+			var _data = this.data().childNodes;
+			var class_name = "Element";
 
-		this.className (_class_name);
+			this.className (_class_name);
 
-		this.onfirst = function () {
-			_index = 0;
-			return _data[_index];
-		};
+			this.onfirst = function () {
+				_index = 0;
+				return _data[_index];
+			};
 
-		this.onnext = function () {
-			_index++;
-			return _data[_index];
-		};
+			this.onnext = function () {
+				_index++;
+				return _data[_index];
+			};
 
-		this.onref = function () {
-			return _index;
-		};
+			this.onref = function () {
+				return _index;
+			};
 
-		this.onindex = function (index) {
-			_index = index;
-			return _data[_index];
-		};
+			this.onindex = function (index) {
+				_index = index;
+				return _data[_index];
+			};
 
-		this.onend = function () {
-			if (_index >= _data.length)
-				return true;
-			else
-				return false;
-		};
+			this.onend = function () {
+				if (_index >= _data.length)
+					return true;
+				else
+					return false;
+			};
+		}
 	};
 
-	return {
-		oninit: oninit
-	};
+	return DomIterator;
 }) ());
 

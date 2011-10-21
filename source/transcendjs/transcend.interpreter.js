@@ -11,7 +11,7 @@
 //-----------------------------------------------------------------------------
 Core.extend ("Interpreter", "Container", (function () {
 	var _type = Core._("Helpers.Type");
-	var _handler;
+	var _default_handler;
 
 	var Interpreter = /** @lends Interpreter.prototype */ {
 		//---------------------------------------------------------------------
@@ -47,7 +47,7 @@ Core.extend ("Interpreter", "Container", (function () {
 			//if (_type.isFunction (handler))
 			//	_unbinded_handler = handler;
 			//else
-			//	_unbinded_handler = _handler;
+			//	_unbinded_handler = _default_handler;
 
 			//-----------------------------------------------------------------
 			/**
@@ -141,7 +141,7 @@ Core.extend ("Interpreter", "Container", (function () {
 			if (context) this.context (context);
 
 			//this.handler = _unbinded_handler.bind (_command_state);
-			this.handler (_type.isFunction (handler) ? handler : _handler);
+			this.handler (_type.isFunction (handler) ? handler : _default_handler);
 		},
 
 		//---------------------------------------------------------------------
@@ -209,12 +209,12 @@ Core.extend ("Interpreter", "Container", (function () {
 	 * The handler function acts as a method of the current command state and
 	 * sets it's own id, parameters and nodes properties, taking the form:<br/>
 	 * <i>function (mixed symbol)</i>
-	 * @name Interpreter#_handler
-	 * @private
+	 * @memberOf Interpreter.prototype
 	 * @function
+	 * @private
 	 * @param {mixed} symbol Any symbol data that may be accessed via a model
 	 */
-	_handler = function (symbol) {
+	_default_handler = function (symbol) {
 		if (_type.isObject (symbol)) {
 			symbol = $H(symbol);
 
