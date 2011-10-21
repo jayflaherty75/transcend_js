@@ -105,7 +105,7 @@ Core.extend ("XmlRpcIterator", "IteratorAbstract", (function () {
 	//-------------------------------------------------------------------------
 	/**
 	 * Description, events, exceptions, example
-	 * @name XmlRpcIterator#_getvalue
+	 * @memberOf XmlRpcIterator.prototype
 	 * @function
 	 * @private
 	 * @param {Iterator} iterator Description
@@ -143,7 +143,7 @@ Core.extend ("XmlRpcIterator", "IteratorAbstract", (function () {
 	//-------------------------------------------------------------------------
 	/**
 	 * Description, events, exceptions, example
-	 * @name XmlRpcIterator#_increment
+	 * @memberOf XmlRpcIterator.prototype
 	 * @function
 	 * @private
 	 * @param {Iterator} iterator Description
@@ -172,7 +172,7 @@ Core.extend ("XmlRpcIterator", "IteratorAbstract", (function () {
 	//-------------------------------------------------------------------------
 	/**
 	 * Description, events, exceptions, example
-	 * @name XmlRpcIterator#_nochange
+	 * @memberOf XmlRpcIterator.prototype
 	 * @function
 	 * @private
 	 * @param {mixed} newval Description

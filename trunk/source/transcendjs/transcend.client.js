@@ -11,7 +11,7 @@
 //-----------------------------------------------------------------------------
 Core.extend ("ClientController", "Controller", (function () {
 	var _type = Core._("Helpers.Type");
-	var send_action, success_action, error_action;
+	var _send_action, _success_action, _error_action;
 
 	var ClientController = /** @lends ClientController.prototype */ {
 		//---------------------------------------------------------------------
@@ -21,9 +21,9 @@ Core.extend ("ClientController", "Controller", (function () {
 		 * @constructs
 		 */
 		oninit: function () {
-			this.register ("_send", send_action);
-			this.register ("_success", success_action);
-			this.register ("_error", error_action);
+			this.register ("_send", _send_action);
+			this.register ("_success", _success_action);
+			this.register ("_error", _error_action);
 		},
 
 		//---------------------------------------------------------------------
@@ -35,13 +35,13 @@ Core.extend ("ClientController", "Controller", (function () {
 	//-------------------------------------------------------------------------
 	/**
 	 * Description, events, exceptions, example
-	 * @name ClientController#$_send
+	 * @memberOf ClientController.prototype
 	 * @function
 	 * @param {Event} event Description
 	 * @param {mixed} message Description
 	 * @param {Function} handler Description
 	 */
-	send_action = function (event, message, handler) {
+	_send_action = function (event, message, handler) {
 		var controllers = this.get ("_controllers");
 
 		if (message.multi_call) {
@@ -57,13 +57,13 @@ Core.extend ("ClientController", "Controller", (function () {
 	//-------------------------------------------------------------------------
 	/**
 	 * Description, events, exceptions, example
-	 * @name ClientController#$_success
+	 * @memberOf ClientController.prototype
 	 * @function
 	 * @param {Event} event Description
 	 * @param {mixed} response Description
 	 * @param {Function} handler Description
 	 */
-	success_action = function (event, response) {
+	_success_action = function (event, response) {
 		if (_type.isFunction (this.onresponse))
 			this.onresponse (response, true);
 	};
@@ -71,13 +71,13 @@ Core.extend ("ClientController", "Controller", (function () {
 	//-------------------------------------------------------------------------
 	/**
 	 * Description, events, exceptions, example
-	 * @name ClientController#$_error
+	 * @memberOf ClientController.prototype
 	 * @function
 	 * @param {Event} event Description
 	 * @param {mixed} response Description
 	 * @param {Function} handler Description
 	 */
-	error_action = function (event, response) {
+	_error_action = function (event, response) {
 		if (_type.isFunction (this.onresponse))
 			this.onresponse (response, false);
 	};

@@ -9,74 +9,78 @@
  */
 
 //-----------------------------------------------------------------------------
-Core.extend ("ObjectModel", "ModelAbstract", /** @lends HashModel */ {
-	/**
-	 * @class Simple model for handling basic associative arrays/objects
-	 * @extends ModelAbstract
-	 * @constructs
-	 */
-	oninit: function () {
-		this.className ("Object");
-		this.defaultIterator (Core.getClass ("ObjectIterator"));
-	},
+Core.extend ("ObjectModel", "ModelAbstract", (function () {
+	var ObjectModel = /** @lends ObjectModel.prototype */ {
+		/**
+		 * @class Simple model for handling basic associative arrays/objects
+		 * @extends ModelAbstract
+		 * @constructs
+		 */
+		oninit: function () {
+			this.className ("Object");
+			this.defaultIterator (Core.getClass ("ObjectIterator"));
+		},
 
-	oncreate: function () {
-		return typeof (arguments[0]) == "object" ? arguments[0] : {};
-	},
+		oncreate: function () {
+			return typeof (arguments[0]) == "object" ? arguments[0] : {};
+		},
 
-	filterReference: function (ref) {
-		ref = typeof (ref) == "string" ? ref : ref.toString();
+		filterReference: function (ref) {
+			ref = typeof (ref) == "string" ? ref : ref.toString();
 
-		return ref;
-	},
+			return ref;
+		},
 
-	getFirstRef: function () {
-		return $H(this).keys()[0];
-	},
+		getFirstRef: function () {
+			return $H(this).keys()[0];
+		},
 
-	getLastRef: function () {
-		var keys = $H(this).keys();
-		return keys[keys.length - 1];
-	},
+		getLastRef: function () {
+			var keys = $H(this).keys();
+			return keys[keys.length - 1];
+		},
 
-	onset: function (ref, value) {
-		(this)[ref] = value;
-	},
+		onset: function (ref, value) {
+			(this)[ref] = value;
+		},
 
-	onget: function (ref) {
-		return (this)[ref];
-	},
+		onget: function (ref) {
+			return (this)[ref];
+		},
 
-	onunset: function (ref) {
-		var value = (this)[ref];
-		if (typeof (value) != "undefined") delete (this)[ref];
-		return value;
-	},
+		onunset: function (ref) {
+			var value = (this)[ref];
+			if (typeof (value) != "undefined") delete (this)[ref];
+			return value;
+		},
 
-	oninsert: function (ref, value) {
-	},
+		oninsert: function (ref, value) {
+		},
 
-	oncompare: function (ref, value) {
-		var element = this.get (ref);
+		oncompare: function (ref, value) {
+			var element = this.get (ref);
 
-		switch (typeof (value)) {
-		case "string":
-			value = parseInt (value);
-			break;
-		case "boolean":
-			value = value ? 1 : 0;
-			break;
-		case "function":
-			value = value ();
-			break;
-		default:
-			value = 0;
+			switch (typeof (value)) {
+			case "string":
+				value = parseInt (value);
+				break;
+			case "boolean":
+				value = value ? 1 : 0;
+				break;
+			case "function":
+				value = value ();
+				break;
+			default:
+				value = 0;
+			}
+
+			if (value > element) return 1;
+			if (value < element) return -1;
+
+			return 0;
 		}
+	};
 
-		if (value > element) return 1;
-		if (value < element) return -1;
-
-		return 0;
-	}
-});
+	return ObjectModel;
+}) ());
 

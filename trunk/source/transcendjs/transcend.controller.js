@@ -12,7 +12,7 @@
 Core.extend ("Controller", "Interpreter", (function () {
 	var _type = Core._("Helpers.Type");
 	var _ref_class = Core.getClass ("Reference");
-	var _handler, _immediate_mode_onchange, oninit;
+	var _default_handler, _immediate_mode_onchange, oninit;
 	var _initialize, _uninitialize, _batch_start, _batch_end;
 
 	var Controller = /** @lends Controller.prototype */ {
@@ -133,7 +133,7 @@ Core.extend ("Controller", "Interpreter", (function () {
 				return result;
 			};
 
-			this.handler (_handler);
+			this.handler (_default_handler);
 
 			this.register ("initialize", _initialize);
 			this.register ("uninitialize", _uninitialize);
@@ -197,8 +197,9 @@ Core.extend ("Controller", "Interpreter", (function () {
 	//-------------------------------------------------------------------------
 	/**
 	 * Description
-	 * @name Controller#$initialize
+	 * @memberOf Controller.prototype
 	 * @function
+	 * @private
 	 */
 	_initialize = function () {
 		if (_type.isFunction (this.onstartup)) return this.onstartup ();
@@ -207,8 +208,9 @@ Core.extend ("Controller", "Interpreter", (function () {
 	//-------------------------------------------------------------------------
 	/**
 	 * Description
-	 * @name Controller#$uninitialize
+	 * @memberOf Controller.prototype
 	 * @function
+	 * @private
 	 */
 	_uninitialize = function () {
 		if (_type.isFunction (this.onshutdown)) return this.onshutdown ();
@@ -217,8 +219,9 @@ Core.extend ("Controller", "Interpreter", (function () {
 	//-------------------------------------------------------------------------
 	/**
 	 * Description
-	 * @name Controller#$batch_start
+	 * @memberOf Controller.prototype
 	 * @function
+	 * @private
 	 */
 	_batch_start = function () {
 		if (_type.isFunction (this.onbatchstart)) this.onbatchstart ();
@@ -227,8 +230,9 @@ Core.extend ("Controller", "Interpreter", (function () {
 	//-------------------------------------------------------------------------
 	/**
 	 * Description
-	 * @name Controller#$batch_end
+	 * @memberOf Controller.prototype
 	 * @function
+	 * @private
 	 */
 	_batch_end = function () {
 		if (_type.isFunction (this.onbatchend)) this.onbatchend ();
@@ -237,12 +241,12 @@ Core.extend ("Controller", "Interpreter", (function () {
 	//-------------------------------------------------------------------------
 	/**
 	 * Description
-	 * @name Controller#_default_handler
+	 * @memberOf Controller.prototype
 	 * @private
 	 * @function
 	 * @param {mixed} symbol Description
 	 */
-	_handler = function (symbol) {
+	_default_handler = function (symbol) {
 		if (_type.isObject (symbol)) {
 			symbol = $H(symbol);
 
@@ -262,7 +266,7 @@ Core.extend ("Controller", "Interpreter", (function () {
 	//-------------------------------------------------------------------------
 	/**
 	 * Description
-	 * @name Controller#_immediate_mode_onchange
+	 * @memberOf Controller.prototype
 	 * @private
 	 * @function
 	 * @param {boolean} mode Description
@@ -275,6 +279,8 @@ Core.extend ("Controller", "Interpreter", (function () {
 						"Multicast", this.onaction
 					);
 					mcast.listen (this.run.bind (this));
+
+					this.onaction = mcast.call.bind (mcast);
 				}
 				else {
 					this.onaction = this.run.bind (this);

@@ -133,7 +133,7 @@ Core.register ("Context", (function () {
 	//-------------------------------------------------------------------------
 	/**
 	 * Description, events, exceptions, example
-	 * @name Context#_interpreter_onchange
+	 * @memberOf Context.prototype
 	 * @function
 	 * @private
 	 * @param {Interpreter} interpreter Description

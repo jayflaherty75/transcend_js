@@ -11,8 +11,8 @@
 //-----------------------------------------------------------------------------
 Core.extend ("NodeContext", "Context", (function () {
 	var _type = Core._("Helpers.Type");
-	var process_data, write_data, copy_data, save_node, _default;
-	var apply_attributes, apply_style, text;
+	var _process_data, _write_data, _copy_data, _save_node, _default;
+	var _apply_attributes, _apply_style, _text;
 
 	var NodeContext = /** @lends NodeContext.prototype */ {
 		//---------------------------------------------------------------------
@@ -24,9 +24,9 @@ Core.extend ("NodeContext", "Context", (function () {
 		 */
 		oninit: function () {
 			this.register ("_default", _default);
-			this.register ("apply-attributes", apply_attributes);
-			this.register ("apply-style", apply_style);
-			this.register ("text", text);
+			this.register ("apply-attributes", _apply_attributes);
+			this.register ("apply-style", _apply_style);
+			this.register ("text", _text);
 		},
 
 		//---------------------------------------------------------------------
@@ -72,7 +72,7 @@ Core.extend ("NodeContext", "Context", (function () {
 	//-------------------------------------------------------------------------
 	/**
 	 * Description, events, exceptions, example
-	 * @name NodeContext#process_data
+	 * @memberOf NodeContext.prototype
 	 * @private
 	 * @function
 	 * @param {Interpreter} interpreter Description
@@ -81,7 +81,7 @@ Core.extend ("NodeContext", "Context", (function () {
 	 * @return Description
 	 * @type mixed
 	 */
-	process_data = function (interpreter, id, params) {
+	_process_data = function (interpreter, id, params) {
 		var data = interpreter.get (id);
 
 		if (_type.isDefined (data)) {
@@ -112,13 +112,13 @@ Core.extend ("NodeContext", "Context", (function () {
 	//-------------------------------------------------------------------------
 	/**
 	 * Description, events, exceptions, example
-	 * @name NodeContext#write_data
+	 * @memberOf NodeContext.prototype
 	 * @private
 	 * @function
 	 * @param {mixed} node Description
 	 * @param {mixed} data Description
 	 */
-	write_data = function (node, data) {
+	_write_data = function (node, data) {
 		if (!_type.isObject (data)) {
 			if (_type.isFunction (data)) {
 				node.append (node.model.getInstance ("text", data ()));
@@ -132,14 +132,14 @@ Core.extend ("NodeContext", "Context", (function () {
 	//-------------------------------------------------------------------------
 	/**
 	 * Description, events, exceptions, example
-	 * @name NodeContext#copy_data
+	 * @memberOf NodeContext.prototype
 	 * @private
 	 * @function
 	 * @param {mixed} data Description
 	 * @return Description
 	 * @type Object
 	 */
-	copy_data = function (data) {
+	_copy_data = function (data) {
 		var object = {};
 
 		for (key in data) {
@@ -155,14 +155,14 @@ Core.extend ("NodeContext", "Context", (function () {
 	//-------------------------------------------------------------------------
 	/**
 	 * Description, events, exceptions, example
-	 * @name NodeContext#save_node
+	 * @memberOf NodeContext.prototype
 	 * @private
 	 * @function
 	 * @param {Object} set Description
 	 * @param {String} id Description
 	 * @param {mixed} node Description
 	 */
-	save_node = function (set, id, node) {
+	_save_node = function (set, id, node) {
 		var current = set[id];
 
 		if (_type.isUndefined (current)) 
@@ -177,7 +177,7 @@ Core.extend ("NodeContext", "Context", (function () {
 	//-------------------------------------------------------------------------
 	/**
 	 * Description, events, exceptions, example
-	 * @name NodeContext#_default
+	 * @memberOf NodeContext.prototype
 	 * @private
 	 * @function
 	 * @param {String} id Description
@@ -190,7 +190,7 @@ Core.extend ("NodeContext", "Context", (function () {
 		var state = this.get ("_state");
 		var model = this.model ();
 		var parent = state["a"];
-		var data = process_data (this, params["id"], params);
+		var data = _process_data (this, params["id"], params);
 		var count = (data.length || 1);
 		var node, par_iterator;
 		var result = true;
@@ -212,11 +212,11 @@ Core.extend ("NodeContext", "Context", (function () {
 				state["a"] = parent;
 			}
 
-			write_data (node, data[i]);
+			_write_data (node, data[i]);
 			parent.append (node);
 
 			if (_type.isDefined (params["id"])) 
-				save_node (state["x"], params["id"], node);
+				_save_node (state["x"], params["id"], node);
 		}
 
 		return result;
@@ -225,7 +225,7 @@ Core.extend ("NodeContext", "Context", (function () {
 	//-------------------------------------------------------------------------
 	/**
 	 * Description, events, exceptions, example
-	 * @name NodeContext#apply_attributes
+	 * @memberOf NodeContext.prototype
 	 * @private
 	 * @function
 	 * @param {String} id Description
@@ -233,10 +233,10 @@ Core.extend ("NodeContext", "Context", (function () {
 	 * @return Description
 	 * @type Boolean
 	 */
-	apply_attributes = function (id, params) {
+	_apply_attributes = function (id, params) {
 		var state = this.get ("_state");
 		var parent = state["a"];
-		var data = copy_data (this.get (params["id"]));
+		var data = _copy_data (this.get (params["id"]));
 
 		parent.set (data);
 
@@ -246,7 +246,7 @@ Core.extend ("NodeContext", "Context", (function () {
 	//-------------------------------------------------------------------------
 	/**
 	 * Description, events, exceptions, example
-	 * @name NodeContext#apply_style
+	 * @memberOf NodeContext.prototype
 	 * @private
 	 * @function
 	 * @param {String} id Description
@@ -254,12 +254,12 @@ Core.extend ("NodeContext", "Context", (function () {
 	 * @return Description
 	 * @type Boolean
 	 */
-	apply_style = function (id, params) {
+	_apply_style = function (id, params) {
 		var state = this.get ("_state");
 		var parent = state["a"];
 
 		if (_type.isFunction (parent["setStyle"])) {
-			parent.setStyle (copy_data (this.get (params["id"])));
+			parent.setStyle (_copy_data (this.get (params["id"])));
 		}
 
 		return true;
@@ -268,7 +268,7 @@ Core.extend ("NodeContext", "Context", (function () {
 	//-------------------------------------------------------------------------
 	/**
 	 * Description, events, exceptions, example
-	 * @name NodeContext#text
+	 * @memberOf NodeContext.prototype
 	 * @private
 	 * @function
 	 * @param {String} id Description
@@ -276,7 +276,7 @@ Core.extend ("NodeContext", "Context", (function () {
 	 * @return Description
 	 * @type Boolean
 	 */
-	text = function (id, params) {
+	_text = function (id, params) {
 		var state = this.get ("_state");
 		var model = this.model ();
 		var parent = state["a"];

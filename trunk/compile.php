@@ -60,7 +60,7 @@
 		"transcend.xmlrpc.client.js",
 	);
 	$exec_docs = "java -jar \"" . $settings["jsdoc"] . "\" \"" . 
-		$settings["jsdocrun"] . "\" -a -p -v -t=\"" . $settings["templates"] . 
+		$settings["jsdocrun"] . "\" -a -p -t=\"" . $settings["templates"] . 
 		"\" -d=\"" . $settings["docs"] . "\" \"" . $settings["scripts"] . "\"";
 	$exec_compress = "java -jar \"" . $settings["compressor"] . "\" -v " . 
 		$settings["libfile"] . " -o " . $settings["outfile"];
