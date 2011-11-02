@@ -55,10 +55,10 @@ Core.extend ("Container", "ContainerAbstract", (function () {
 		 * @type Any
 		 */
 		onget: function (key) {
-			if (!_type.isUndefined (key))
+			//if (!_type.isUndefined (key))
 				return this.parameters[key];
-			else
-				return false;
+			//else
+			//	return false;
 		},
 
 		//---------------------------------------------------------------------
@@ -90,7 +90,7 @@ Core.extend ("Container", "ContainerAbstract", (function () {
 		 * @type Any
 		 */
 		onunset: function (key) {
-			if (!_type.isUndefined (key))
+			if (_type.isDefined (key))
 				delete this.parameters[key];
 		},
 

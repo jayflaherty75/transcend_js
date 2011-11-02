@@ -10,6 +10,8 @@
 
 //-----------------------------------------------------------------------------
 Core.extend ("TemplateView", "View", (function () {
+	var _type = Core._("Helpers.Type");
+
 	var TemplateView = /** @lends TemplateView.prototype */ {
 		/**
 		 * @class Default view providing integration with {@link Template} 
@@ -49,6 +51,7 @@ Core.extend ("TemplateView", "View", (function () {
 			var _engine = Core._("Template", _context);
 
 			_engine.model (_model);
+			_engine.link (this);
 
 			this.engine (_engine);
 
@@ -78,16 +81,18 @@ Core.extend ("TemplateView", "View", (function () {
 
 			//---------------------------------------------------------------------
 			/**
+			 * @ignore
 			 * Handles assigned values for the base class.
 			 * @name TemplateView#onset
 			 * @function
 			 * @param {string} key 
 			 * @param {string} value 
 			 */
-			this.onset = _engine.onset.bind (_engine);
+			//this.onset = _engine.onset.bind (_engine);
 
 			//---------------------------------------------------------------------
 			/**
+			 * @ignore
 			 * Handles requests for values from the base class.
 			 * @name TemplateView#onget
 			 * @function
@@ -95,13 +100,14 @@ Core.extend ("TemplateView", "View", (function () {
 			 * @return Returns the value from the given key.
 			 * @type Any
 			 */
-			this.onget = _engine.onget.bind (_engine);
+			//this.onget = _engine.onget.bind (_engine);
 
 			//---------------------------------------------------------------------
-			this.isset = _engine.isset.bind (_engine);
+			//this.isset = _engine.isset.bind (_engine);
 
 			//---------------------------------------------------------------------
 			/**
+			 * @ignore
 			 * Handles requests to delete values from the base class.
 			 * @name TemplateView#onunset
 			 * @function
@@ -109,7 +115,7 @@ Core.extend ("TemplateView", "View", (function () {
 			 * @return Returns the deleted value from the given key.
 			 * @type Any
 			 */
-			this.onunset = _engine.onunset.bind (_engine);
+			//this.onunset = _engine.onunset.bind (_engine);
 
 			//---------------------------------------------------------------------
 			/**
@@ -126,6 +132,24 @@ Core.extend ("TemplateView", "View", (function () {
 			};
 
 			this._ = this.getElement;
+		},
+
+		//---------------------------------------------------------------------
+		/**
+		 * Sets the {@link Template} data for this View.
+		 * @name TemplateView#setTemplate
+		 * @function
+		 * @param {object} template Template data
+		 * @return Returns <i>this</i> for use in chain calls.
+		 * @type TemplateView
+		 */
+		setTemplate: function (template) {
+			var engine = this.engine ();
+
+			if (_type.isDefined (engine))
+				engine.code (template);
+
+			return this;
 		}
 	};
 
