@@ -28,11 +28,153 @@
 	var save_instance;
 
 	/**
- 	 * @namespace Singleton maintaining all classes, interfaces and singletons 
-	 * and provides an interface for registering events and listening for these 
-	 * events without cluttering up the global environment (Core.globalize() 
-	 * makes these globally accessible if preferred).  Initializes the 
-	 * TranscendJS framework.
+ 	 * @namespace 
+ 	 * The Core class is, by default, the only globally defined class in the 
+ 	 * TranscendJS framework.  Core is a singleton which initializes the 
+ 	 * framework, maintains all class definitions and provides the following 
+ 	 * features:<br/>
+ 	 * 
+ 	 * <ul>
+ 	 * <li>Registering classes, objects and singletons</li>
+ 	 * <li>Creating instances, getting singletons and globalizing</li>
+ 	 * <li>Default methods and using Core hierarchies</li>
+ 	 * <li>Listening for events and triggering them</li>
+ 	 * <li>Uniquely identifying objects</li>
+ 	 * </ul>
+ 	 * <b>Registering classes, objects and singletons</b><br/>
+ 	 * <br/>
+ 	 * Classes are simply registered via the <i>register()</i> method which accepts 
+ 	 * a class name, prototype and static method sets.  An existing class 
+ 	 * may be extended using the <i>extend()</i> method.  To register an object, 
+ 	 * library or singleton, use the <i>singleton()</i> method.<br/>
+ 	 * <br/>
+ 	 * The class constructor is the <i>initialize()</i> method, similar to Prototype.  
+ 	 * However, there is also a special case constructor event method, 
+ 	 * <i>oninit()</i>.  When extending an existing class and the <i>oninit()</i> method is 
+ 	 * defined, it is "stacked" with any <i>oninit()</i> methods declared in ancestor 
+ 	 * classes.  Whether or not this feature is supported is up to the ancestor 
+ 	 * class(es) and <i>oninit()</i> must be called from the original constructor.  If 
+ 	 * a child class defines a new constructor, the original is overridden and 
+ 	 * so are the <i>oninit()</i> methods.  A child class may also define an 
+ 	 * <i>oninit_override()</i> method which will override all other <i>oninit()</i> 
+ 	 * declarations but keep the original <i>initialize()</i> constructor.<br/>
+ 	 * <pre>
+ 	 * Core.extend ("ButtonControl", "UIControlAbstract", {
+ 	 * 	oninit: function () {
+ 	 * 		//...
+ 	 * 	},
+ 	 * 
+ 	 * 	onpostrender: function (parent, elements) {
+ 	 * 		//...
+ 	 * 	}
+ 	 * },
+ 	 * {
+ 	 * 	test: function () {
+ 	 * 		//...
+ 	 * 		return true;
+ 	 * 	}
+ 	 * });
+ 	 * </pre>
+ 	 * <b>Creating Instances, Getting Singletons and Globalizing</b><br/>
+ 	 * <br/>
+ 	 * A new object may be instantiated using the <i>getInstance()</i> method.  This 
+ 	 * method will also return the single instance of any singletons that have 
+ 	 * been declared.  In the next section, we will talk about the <i>_()</i> 
+ 	 * (underscore) method which is an alias for getInstance and how this can 
+ 	 * be used to organize code.  You may also access the class directly using 
+ 	 * <i>getClass()</i>.<br/>
+ 	 * <br/>
+ 	 * By default, all classes must be accessed through the Core namespace.  
+ 	 * However, you may use the <i>globalize()</i> method to make specific 
+ 	 * classes/singletons available in the global namespace or, if no class 
+ 	 * name is provided, all declarations are made available globally.  So, 
+ 	 * instead of using <i>Core.getInstance ("Controller")</i> or 
+ 	 * <i>Core._("Controller")</i>, calling <i>globalize()</i> will allow you to use the new 
+ 	 * operator: <i>new Controller()</i>.  The second parameter to <i>globalize()</i> allows 
+ 	 * you to control whether existing global names should be overwritten.<br/>
+ 	 * <br/>
+ 	 * Any instances created may be deleted by the <i>destroy()</i> method which 
+ 	 * will call the <i>uninitialize()</i> destructor method.<br/>
+ 	 * <br/>
+ 	 * <b>The Default Method and Using Core Hierarchies</b><br/>
+ 	 * <br/>
+ 	 * A powerful organizational tool of the TranscendJS framework is it's use 
+ 	 * of default methods to drill down into hierarchical structures.  Default 
+ 	 * methods are simply aliases to existing methods in a class.  Core 
+ 	 * recognizes these methods and uses them to chain calls to simplify 
+ 	 * drilling down into Core hierarchies defined using {@link CoreBranch} or 
+ 	 * one of it's varients, such as {@link ExceptionBranch}.  An instance of a 
+ 	 * branch may be registered as a singleton in the Core namespace.  A good 
+ 	 * example of this is the Helpers branch that allows us to organize 
+ 	 * "helper" libraries.  Let's say we want to read a value from the query 
+ 	 * string using the {@link QueryStringHelpers} library.  We would have to 
+ 	 * get the Helpers singleton, pass "QueryString" to the Helpers' <i>getValue()</i> 
+ 	 * method which would return the QueryString library and then pass the key 
+ 	 * to the value we need to the library's <i>get()</i> method.  This would look 
+ 	 * like this:<br/>
+ 	 * <pre>
+ 	 * var foo = Core.getInstance("Helpers").getValue("QueryString").get("foo");
+ 	 * </pre>
+ 	 * Each of these methods is a default method but, as you can see here, 
+ 	 * that's little consolation:<br/>
+ 	 * <pre>
+ 	 * var foo = Core._("Helpers")._("QueryString")._("foo");
+ 	 * </pre>
+ 	 * When calling the <i>Core._()</i> method, it allows any first parameters to be 
+ 	 * delimited by a period and makes all the calls for you:<br/>
+ 	 * <pre>
+ 	 * var foo = Core._("Helpers.QueryString.foo");
+ 	 * </pre>
+ 	 * This allows the TranscendJS framework to offer more features without 
+ 	 * cluttering up the Core namespace.  In many cases, you may want easy 
+ 	 * access to a specific library and call it's methods directory, which is 
+ 	 * the case in the Type library for checking the data types of variables:<br/>
+ 	 * <pre>
+ 	 * var _type = Core._("Helpers.Type");
+ 	 * //...
+ 	 * if (_type.isDefined (foo)) { ... };
+ 	 * if (_type.isFunction (foo.someMethod) { ... };
+ 	 * if (_type._(foo) == "String") { ... };
+ 	 * </pre>
+ 	 * TranscendJS uses this approach for storing helper libraries, Exception 
+ 	 * types, globally accessible {@link Eventcast} instances, {@link Template} 
+ 	 * data and configuration ({@link ConfigBranch}).  You can even create your own hierarchies.  See 
+ 	 * {@link CoreBranch} for more details.<br/>
+ 	 * <br/>
+ 	 * <b>The Difference Between "_" and <i>getInstance()</i></b><br/>
+ 	 * <br/>
+ 	 * You would think that there would be a lot of overhead in supporting 
+ 	 * default method traversal in <i>every</i> object instantiation and you 
+ 	 * would be absolutely right.  So, unlike other classes, the <i>Core._()</i> 
+ 	 * default method isn't just an alias, it is it's own method.  For 
+ 	 * performance, you can use the <i>getInstance()</i> method, which simply 
+ 	 * instantiates the object from a direct name.<br/>
+ 	 * <br/>
+ 	 * <b>Listening for Events and Triggering Them</b><br/>
+ 	 * <br/>
+ 	 * It's quite common to set a function to the event method of an object, 
+ 	 * such as the onclick event of an Image object.  However, what happens 
+ 	 * when two pieces of code want to set a handler to the same event?  
+ 	 * <i>Core.listen()</i> applies a handler for the given event and "stacks" these 
+ 	 * handlers automatically.  See {@link Multicast} for more information on 
+ 	 * how this is handled and how you can further manipulate it.  For more 
+ 	 * complex event handling, see {@link Eventcast}.  If you need to trigger or 
+ 	 * "fire" an event, use <i>Core.trigger()</i>.<br/>
+ 	 * <br/>
+ 	 * <b>Uniquely Identifying Objects</b><br/>
+ 	 * <br/>The <i>getID()</i> and <i>setID()</i> methods are commonly used throughout the 
+ 	 * framework to uniquely define objects.  Everything can be assumed to have 
+ 	 * an ID.  If you attempt to get an ID from an object that doesn't have 
+ 	 * one, a unique ID is generated for the object and it is forever tagged 
+ 	 * with that ID.  The ID may be set manually as well.  This is useful for 
+ 	 * serialization and deserialization.<br/>
+ 	 * <br/>
+ 	 * If you would like to continue with the tutorial, continue to {@link CoreBranch}.<br/>
+ 	 * <br/>
+ 	 * For Helper libraries, see {@link ArrayHelpers}, {@link CookieHelpers}, 
+ 	 * {@link CSSHelpers}, {@link EventHelpers}, {@link QueryStringHelpers}, 
+ 	 * {@link StringHelpers}, {@link TypeHelpers},  {@link UniqueHelpers}, 
+ 	 * {@link ViewHelpers}.<br/><br/>
 	 */
 	Core = {
 		/**
@@ -45,7 +187,7 @@
 		//--------------------------------------------------------------------
 		/**
 		 * Create a new class constructor that may be instantiated from Core
-		 * interface.  This may be done by calling <b>Core._{"ClassName")</b>.
+		 * interface.  This may be done by calling <i>Core._{"ClassName")</i>.
 		 * @memberOf Core
 		 * @function
 		 * @param {string} name Name of class
@@ -53,6 +195,21 @@
 		 * @param {object} statics Static methods added to class definition
 		 * @return Class constructor of the newly registered class
 		 * @type object
+		 * @example
+		 * Core.register ("MyClass", {
+	 	 * 	initialize: function () {
+	 	 * 		//...
+	 	 * 	},
+	 	 * 
+	 	 * 	method: function (param1, param2) {
+	 	 * 		//...
+	 	 * 	}
+	 	 * },
+	 	 * {
+	 	 * 	staticMethod: function () {
+	 	 * 		//...
+	 	 * 	}
+	 	 * });
 		 */
 		register: function (name, methods, statics) {
 			var object;
@@ -82,6 +239,22 @@
 		 * @param {object} statics Static methods added to class definition
 		 * @return Class constructor of the newly registered class
 		 * @type object
+		 * @example
+		 * Core.extend ("ButtonControl", "UIControlAbstract", {
+	 	 * 	oninit: function () {
+	 	 * 		//...
+	 	 * 	},
+	 	 * 
+	 	 * 	onpostrender: function (parent, elements) {
+	 	 * 		//...
+	 	 * 	}
+	 	 * },
+	 	 * {
+	 	 * 	test: function () {
+	 	 * 		//...
+	 	 * 		return true;
+	 	 * 	}
+	 	 * });
 		 */
 		extend: function (name, parent, methods, statics) {
 			var object;
@@ -124,7 +297,7 @@
 		/**
 		 * Accepts either a constructor or object for its <i>methods</i>
 		 * parameter and registers an interface object accessible via the
-		 * <b>Core._()</b> method.
+		 * <i>Core._()</i> method.
 		 * @memberOf Core
 		 * @function
 		 * @param {string} name Name of singleton
@@ -132,6 +305,8 @@
 		 * @param {object} statics Static methods added to class definition
 		 * @return Interface of the newly registered singleton
 		 * @type object
+		 * @example
+		 * Core.singleton ("Files", Core._("CoreBranch"));
 		 */
 		singleton: function (name, methods, statics) {
 			var object;
@@ -192,6 +367,16 @@
 		 * @param {object} object Target object to listen to
 		 * @param {string} name Event identifier
 		 * @param {function} listener Listener function
+		 * @example
+		 * var foo = new Image ("images/foo.png");
+		 * 
+		 * Core.listen (foo, "click", function () {
+		 * 	alert ("Handler #1");
+		 * });
+		 * 
+		 * Core.listen (foo, "click", function () {
+		 * 	alert ("Handler #2");
+		 * });
 		 */
 		listen: function (object, name, listener) {
 			name = "on" + name;
@@ -219,6 +404,10 @@
 		 * @param {string} name Name of class, singleton or interface. Optional
 		 * @param {boolean} overwrite Determines whether global values should
 		 * 		be overwritten.  Default is <i>false</i>
+		 * @example
+		 * Core.globalize ();
+		 * var ref1 = Core._("Reference");
+		 * var ref2 = new Reference ();
 		 */
 		globalize: function (name, overwrite) {
 			overwrite = (overwrite === false ? false : true);
@@ -256,6 +445,9 @@
 		 * @param {string} name Name of class
 		 * @return Class constructor
 		 * @type function
+		 * @example
+		 * var eventcast = Core.getClass ("Eventcast");
+		 * var target = eventcast.getTarget (event);	//call static method of class
 		 */
 		getClass: function (name) {
 			var c = _objects[name];
@@ -296,8 +488,8 @@
 
 		//--------------------------------------------------------------------
 		/**
-		 * Calls uninitialize() method of instance if available and deletes
-		 * the instance.
+		 * Calls <i>uninitialize()</i> method of instance if available and 
+		 * deletes the instance.
 		 * @memberOf Core
 		 * @function
 		 * @param {object} instance Object instance to be destructed.
@@ -362,8 +554,8 @@
 		 * Returns an instance of the requested class.  If not a class, 
 		 * returns the interface object.  May automatically call the default
 		 * methods (_) of interfaces by passing a period-delimited chain as
-		 * the name parameter.  Rather than Core._("Helpers")._("Context")._("XML"),
-		 * the simpler chained call can be used: Core._("Helpers.Context.XML").
+		 * the name parameter.  Rather than <i>Core._("Helpers")._("Context")._("XML")</i>,
+		 * the simpler chained call can be used: <i>Core._("Helpers.Context.XML")</i>.
 		 * @memberOf Core
 		 * @function
 		 * @param {string} name Name of class, singleton or interface.  Also
@@ -371,6 +563,12 @@
 		 * 	the Core heirarchy.
 		 * @return New instance
 		 * @type object
+		 * @example
+		 * var foo = Core.getInstance("Helpers").getValue("QueryString").get("foo");
+		 * 
+	 	 * var foo = Core._("Helpers")._("QueryString")._("foo");
+	 	 * 
+	 	 * var foo = Core._("Helpers.QueryString.foo");	//Chain call
 		 */
 		_: function () {
 			var args = $A(arguments);
@@ -432,6 +630,7 @@ Core.register ("CoreBranch", /** @lends CoreBranch.prototype */ {
 	 * 	Core framework.  These may be simply accessed using the Core default
 	 * 	method (_), using period-delimited names to traverse the hierarchy.
 	 * <br/><br/>
+ 	 * If you would like to continue with the tutorial, continue to {@link ConfigBranch}.
 	 * @constructs
 	 */
 	initialize: function () {

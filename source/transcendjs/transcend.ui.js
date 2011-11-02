@@ -14,7 +14,9 @@ Core.singleton ("UI", (function () {
 	var UI;
 
 	/**
-	 * @namespace Description
+	 * @namespace Description<br/>
+	 * <br/>
+ 	 * If you would like to continue with the tutorial, continue to {@link UIControlAbstract}.
 	 */
 	UI = {
 		//---------------------------------------------------------------------

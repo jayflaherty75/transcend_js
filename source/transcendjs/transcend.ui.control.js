@@ -13,10 +13,12 @@ Core.extend ("UIControlAbstract", "Controller", (function () {
 	var _type = Core._("Helpers.Type");
 	var _render_action;
 
-	var UIControlAbstract = {
+	var UIControlAbstract = /** @lends UIControlAbstract.prototype */ {
 		//---------------------------------------------------------------------
 		/**
-		 * @class Description, events, exceptions, example
+		 * @class Description, events, exceptions, example<br/>
+		 * <br/>
+	 	 * If you would like to continue with the tutorial, continue to {@link TransportController}.
 		 * @extends Controller
 		 * @constructs
 		 * @param {type} param_name Description

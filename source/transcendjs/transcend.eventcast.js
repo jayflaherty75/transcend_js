@@ -24,15 +24,17 @@ Core.extend ("Eventcast", "Multicast", (function () {
 	var Eventcast = /** @lends Eventcast.prototype */ {
 		/**
 		 * @class Manages a type of event for a group of target objects and allows 
-		 * 	external code to "listen" for that event from any of the targets.  
-		 * 	Eventcasts may multiple targets and multiple listeners, making it a 
-		 * 	many-to-one-to-many design.  Targets may have separate Eventcasts for 
-		 * 	each event but may also have multiple Eventcasts of the same event, 
-		 * 	allowing for any configuration and for very complex interactions to be 
-		 * 	easily implemented.<br /><br />
+		 * external code to "listen" for that event from any of the targets.  
+		 * Eventcasts may multiple targets and multiple listeners, making it a 
+		 * many-to-one-to-many design.  Targets may have separate Eventcasts for 
+		 * each event but may also have multiple Eventcasts of the same event, 
+		 * allowing for any configuration and for very complex interactions to be 
+		 * easily implemented.<br /><br />
 		 * 
-		 * 	Hook-in function is only set if there are targets and listeners for the
-		 * 	Eventcast.  No resources are wasted on empty calls.<br /><br />
+		 * Hook-in function is only set if there are targets and listeners for the
+		 * Eventcast.  No resources are wasted on empty calls.<br/>
+		 * <br/>
+	 	 * If you would like to continue with the tutorial, continue to {@link Property}.
 		 * @extends Multicast
 		 * @constructs
 		 * @param {string} event_name Name of event to cast

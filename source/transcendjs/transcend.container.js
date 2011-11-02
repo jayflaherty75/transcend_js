@@ -16,7 +16,9 @@ Core.extend ("Container", "ContainerAbstract", (function () {
 		//---------------------------------------------------------------------
 		/**
 		 * @class Basic container providing a generic interface for assigning
-		 * 	values to objects.
+		 * values to objects.<br/>
+		 * <br/>
+	 	 * If you would like to continue with the tutorial, continue to {@link Multicast}.
 		 * @constructs
 		 * @extends ContainerAbstract
 		 */

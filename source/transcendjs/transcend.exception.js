@@ -15,6 +15,9 @@ Core.extend ("ExceptionBranch", "CoreBranch", (function () {
 		/**
 		 * @class Extends CoreBranch to create a storage hierarchy for exceptions.
 		 * <br/><br/>
+	 	 * If you would like to continue with the tutorial, continue to {@link ContainerAbstract}.<br/>
+	 	 * <br/>
+	 	 * See also {@link AssertException}
 		 * @extends CoreBranch
 		 * @constructs
 		 */

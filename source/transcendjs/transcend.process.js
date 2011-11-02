@@ -13,7 +13,9 @@
 Core.register ("Process", (function () {
 	var Process = /** @lends Process.prototype */ {
 		/**
-		 * @class Description
+		 * @class Description<br/>
+		 * <br/>
+	 	 * If you would like to continue with the tutorial, continue to {@link UI}.
 		 * @constructs
 		 * @param {String} name Description
 		 * @param {Function} _callback Description

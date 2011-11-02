@@ -26,7 +26,9 @@ Core.register ("Context", (function () {
 		 * this structure, the default iterator for that model may be used by the 
 		 * rule to traverse the data.  This may be overridden by mapping the data 
 		 * type (model or basic type) to another iterator name, allowing finite 
-		 * control of the interpretation of any data.
+		 * control of the interpretation of any data.<br/>
+		 * <br/>
+	 	 * If you would like to continue with the tutorial, continue to {@link NodeContext}.
 		 * @constructs
 		 * @param {Interpreter} interpreter Interpreter instance to associate with
 		 * 	context.

@@ -15,7 +15,9 @@ Core.extend ("View", "Container", (function () {
 	var View = /** @lends View.prototype */ {
 		/**
 		 * @class View class that may be extended to a child class containing
-		 * 	logic for rendering a module.
+		 * logic for rendering a module.<br/>
+		 * <br/>
+	 	 * If you would like to continue with the tutorial, continue to {@link Controller}.
 		 * @extends Container
 		 * @constructs
 		 */

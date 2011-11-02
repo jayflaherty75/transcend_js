@@ -15,7 +15,9 @@ Core.register ("Multicast",  (function () {
 	var Multicast = /** @lends Multicast.prototype */ {
 		/**
 		 * @class Function container, allowing multiple functions to be called at 
-		 * 	once, each receiving the original parameters passed.
+		 * 	once, each receiving the original parameters passed.<br/>
+		 * <br/>
+	 	 * If you would like to continue with the tutorial, continue to {@link Eventcast}.
 		 * @constructs
 		 * @param {function} listener Any number of listener functions parameters
 		 */

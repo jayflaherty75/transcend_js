@@ -17,7 +17,9 @@ Core.extend ("Batch", "Container", (function () {
 	var Batch = /** @lends Batch.prototype */ {
 		//---------------------------------------------------------------------
 		/**
-		 * @class Batch handles automated controller actions
+		 * @class Batch handles automated controller actions<br/>
+		 * <br/>
+	 	 * If you would like to continue with the tutorial, continue to {@link Reference}.
 		 * @constructs
 		 * @extends Container
 		 * @param {Controller} controller Description

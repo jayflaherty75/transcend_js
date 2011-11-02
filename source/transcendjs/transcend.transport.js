@@ -16,7 +16,9 @@ Core.extend ("TransportController", "Controller", (function () {
 	var TransportController = /** @lends TransportController.prototype */ {
 		//---------------------------------------------------------------------
 		/**
-		 * @class Description
+		 * @class Description<br/>
+		 * <br/>
+	 	 * If you would like to continue with the tutorial, continue to {@link ClientController}.
 		 * @extends Controller
 		 * @constructs
 		 */

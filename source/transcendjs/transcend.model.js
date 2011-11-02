@@ -17,13 +17,15 @@ Core.singleton ("Model", (function () {
 
 	/**
 	 * @namespace Singleton class providing methods for operating on models 
-	 * 	and data.
+	 * and data.<br/>
+	 * <br/>
+ 	 * If you would like to continue with the tutorial, continue to {@link _instanceMethods}.
 	 */
 	Model = {
 		//---------------------------------------------------------------------
 		/**
 		 * Returns an instance for the given model class and caches the object
-		 * based on the given source reference.  
+		 * based on the given source reference.
 		 * @memberOf Model
 		 * @function
 		 * @param {ModelAbstract (constructor)} model_class Description
