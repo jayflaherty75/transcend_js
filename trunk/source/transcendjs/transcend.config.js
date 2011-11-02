@@ -16,6 +16,7 @@ Core.extend ("ConfigBranch", "CoreBranch", (function () {
 	var ConfigBranch = /** @lends ConfigBranch.prototype */ {
 		/**
 		 * @class Description.<br/><br/>
+	 	 * If you would like to continue with the tutorial, continue to {@link ExceptionBranch}.
 		 * @constructs
 		 */
 		oninit: function () {

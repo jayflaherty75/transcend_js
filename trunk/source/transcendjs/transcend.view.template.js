@@ -15,7 +15,9 @@ Core.extend ("TemplateView", "View", (function () {
 	var TemplateView = /** @lends TemplateView.prototype */ {
 		/**
 		 * @class Default view providing integration with {@link Template} 
-		 * 	instances.
+		 * instances.<br/>
+		 * <br/>
+	 	 * If you would like to continue with the tutorial, continue to {@link IteratorAbstract}.
 		 * @extends View
 		 * @constructs
 		 * @param {object} template Template data

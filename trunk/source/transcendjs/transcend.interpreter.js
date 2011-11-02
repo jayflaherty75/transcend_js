@@ -18,7 +18,9 @@ Core.extend ("Interpreter", "Container", (function () {
 		/**
 		 * @class Constructor takes a context and an optional handler, creates 
 		 * a command state for building the current command and assigns the 
-		 * handler method for processing symbols.
+		 * handler method for processing symbols.<br/>
+		 * <br/>
+	 	 * If you would like to continue with the tutorial, continue to {@link Context}.
 		 * @extends Container
 		 * @constructs
 		 * @param {Context} context Description

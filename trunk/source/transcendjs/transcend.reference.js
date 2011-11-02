@@ -29,7 +29,7 @@ Core.register ("Reference", (function () {
 		 * any extra arguments passed to the constructor will be passed to that
 		 * function and it's return value is passed as the value.  If the member
 		 * function is one that supports References, these arguments may too be
-		 * Reference instances, allowing values to be referenced recursively.<br /><br />
+		 * Reference instances, allowing values to be referenced recursively.<br />
 		 * 
 		 * <pre>
 		 * ref = new Reference (object);
@@ -40,7 +40,7 @@ Core.register ("Reference", (function () {
 		 * 
 		 * ref = new Reference (object, method, arg1, arg2);
 		 * value = ref.getValue ();		//returns object.method (arg1, arg2)
-		 * </pre><br />
+		 * </pre>
 		 * 
 		 * The variable <i>ref</i> declares where or how we get a value.  This may be 
 		 * passed to another function later where the getValue() method may be called 
@@ -55,11 +55,12 @@ Core.register ("Reference", (function () {
 		 * untouched.  By default, References bind early, however, this may be 
 		 * changed by setting the bind_early property to false.  This can also 
 		 * be done in a chain call by using the bindLate() method, as 
-		 * follows:<br /><br />
+		 * follows:<br />
 		 * 
 		 * <pre>
 		 * ref = (new Reference (object, method, arg1, arg2)).bindLate ();
-		 * </pre><br />
+		 * </pre>
+	 	 * If you would like to continue with the tutorial, continue to {@link Process}.
 		 * @constructs
 		 * @param {object} object Object being referenced.  May be another 
 		 * 	Reference.

@@ -24,6 +24,10 @@ Core.register ("IteratorAbstract", (function () {
 		 * 	if end.<br/>
 		 * <i>onindex (index)</i> - Handles indexing of element or node, 
 		 * 	adjusting position<br/>
+		 * <br/>
+	 	 * If you would like to continue with the tutorial, continue to {@link ModelAbstract}.<br/>
+	 	 * <br/>
+	 	 * See also {@link ArrayIterator}, {@link ObjectIterator}, {@link DomIterator}.
 		 * @constructs
 		 * @param {any} data Collection or data structure to be iterated
 		 */

@@ -18,7 +18,9 @@ Core.extend ("Controller", "Interpreter", (function () {
 	var Controller = /** @lends Controller.prototype */ {
 		//---------------------------------------------------------------------
 		/**
-		 * @class Description
+		 * @class Description<br/>
+		 * <br/>
+	 	 * If you would like to continue with the tutorial, continue to {@link Interpreter}.
 		 * @extends Interpreter
 		 * @constructs
 		 * @param {Context} context Description

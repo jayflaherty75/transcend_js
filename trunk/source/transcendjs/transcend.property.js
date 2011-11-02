@@ -39,7 +39,9 @@ Core.register ("Property", (function () {
 		 * 	read but also calls <b>onassign</b> and <b>onchange</b> handlers to 
 		 * 	allow for control of the property or to allow code to listen for 
 		 * 	access to the property.  These events may be listened to by event 
-		 * 	<i>Eventcast</i> objects.
+		 * 	<i>Eventcast</i> objects.<br/>
+		 * <br/>
+	 	 * If you would like to continue with the tutorial, continue to {@link View}.
 		 * @param {Any} initial value
 		 * @param {any} memo passed to handler functions
 		 * @return Returns the Property function

@@ -17,14 +17,18 @@ Core.register ("ModelAbstract", (function () {
 		/**
 		 * @class Description
 		 * 
-		 * 	<u>Events</u><br/>
-		 * 	<i>oninit ()</i> - Called on instantiation<br/>
-		 * 	<i>oninsert ()</i> - Description<br/>
-		 * 	<i>onremove ()</i> - Description<br/>
-		 * 	<i>oncompare ()</i> - Description<br/>
-		 * 	<i>onset ()</i> - Description<br/>
-		 * 	<i>onget ()</i> - Description<br/>
-		 * 	<i>onchange ()</i> - Description<br/>
+		 * <u>Events</u><br/>
+		 * <i>oninit ()</i> - Called on instantiation<br/>
+		 * <i>oninsert ()</i> - Description<br/>
+		 * <i>onremove ()</i> - Description<br/>
+		 * <i>oncompare ()</i> - Description<br/>
+		 * <i>onset ()</i> - Description<br/>
+		 * <i>onget ()</i> - Description<br/>
+		 * <i>onchange ()</i> - Description<br/>
+		 * <br/>
+	 	 * If you would like to continue with the tutorial, continue to {@link Model}.<br/>
+	 	 * <br/>
+	 	 * See also {@link ArrayModel}, {@link ObjectModel}, {@link DomModel}, {@link ImageModel}.
 		 * @constructs
 		 */
 		initialize: function (source) {
@@ -408,7 +412,9 @@ Core.register ("ModelAbstract", (function () {
 
 	//-------------------------------------------------------------------------
 	/**
-	 * @namespace Instance methods extend each instance created by the model
+	 * @namespace Instance methods extend each instance created by the model<br/>
+	 * <br/>
+ 	 * If you would like to continue with the tutorial, continue to {@link Batch}.
 	 */
 	_instanceMethods = {
 

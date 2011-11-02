@@ -16,7 +16,9 @@ Core.extend ("ClientController", "Controller", (function () {
 	var ClientController = /** @lends ClientController.prototype */ {
 		//---------------------------------------------------------------------
 		/**
-		 * @class Description
+		 * @class Description<br/>
+		 * <br/>
+	 	 * If you would like to continue with the tutorial, continue to {@link SourceController}.
 		 * @extends Controller
 		 * @constructs
 		 */

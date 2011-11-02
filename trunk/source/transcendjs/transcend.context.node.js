@@ -17,7 +17,9 @@ Core.extend ("NodeContext", "Context", (function () {
 	var NodeContext = /** @lends NodeContext.prototype */ {
 		//---------------------------------------------------------------------
 		/**
-		 * @class Description
+		 * @class Description<br/>
+		 * <br/>
+	 	 * If you would like to continue with the tutorial, continue to {@link Template}.
 		 * @extends Context
 		 * @constructs
 		 * @param {any} data Collection or data structure to be iterated

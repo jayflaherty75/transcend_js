@@ -15,7 +15,9 @@ Core.extend ("Template", "Interpreter", (function () {
 	var Template = /** @lends Template.prototype */ {
 		//---------------------------------------------------------------------
 		/**
-		 * @class Description
+		 * @class Description<br/>
+		 * <br/>
+	 	 * If you would like to continue with the tutorial, continue to {@link TemplateView}.
 		 * @extends Interpreter
 		 * @constructs
 		 */
