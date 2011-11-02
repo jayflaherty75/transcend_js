@@ -1,9 +1,16 @@
+/*!
+ * TranscendJS JavaScript Application Framework v1.0.0
+ * http://www.jasonkflaherty.com/
+ *
+ * Copyright 2011, Jason K. Flaherty
+ * Licensed under the FreeBSD license.
+ * http://www.jasonkflaherty.com/license
+ */
+
 //-----------------------------------------------------------------------------
 /**
- * @fileoverview Tech Net RIA Framework architecture for organizing classes, 
- * 	singletons, helper functions and events.  Provides classes for basic data 
- * 	handling and event management as well as a contextual data-driven 
- * 	interpreter.<br /><br />
+ * @fileoverview TranscendJS JavaScript framework Core for organizing classes, 
+ * 	singletons, helper functions and events.<br /><br />
  * 
  * Copyright &copy; 2011 
  * <a href="http://www.jasonkflaherty.com" target="_blank">Jason K. Flaherty</a>
@@ -24,12 +31,12 @@
  	 * @namespace Singleton maintaining all classes, interfaces and singletons 
 	 * and provides an interface for registering events and listening for these 
 	 * events without cluttering up the global environment (Core.globalize() 
-	 * makes these globally accessible if preferred).  Initializes the Tech 
-	 * Net framework.
+	 * makes these globally accessible if preferred).  Initializes the 
+	 * TranscendJS framework.
 	 */
 	Core = {
 		/**
-		 * Version of Tech Net Client.
+		 * Version of TranscendJS.
 		 * @name Core#version
 		 * @type Constant
 		 */

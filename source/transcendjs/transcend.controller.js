@@ -178,6 +178,64 @@ Core.extend ("Controller", "Interpreter", (function () {
 		//-------------------------------------------------------------------------
 		/**
 		 * Description
+		 * @name Controller#addController
+		 * @function
+		 * @param {String} name Description
+		 * @param {Controller} controller Description
+		 */
+		addController: function (name, controller) {
+			var controllers = this.get ("_controllers");
+
+			controllers[name] = controller;
+		},
+
+		//-------------------------------------------------------------------------
+		/**
+		 * Description
+		 * @name Controller#getController
+		 * @function
+		 * @param {String} name Description
+		 * @return Description
+		 * @type Controller
+		 */
+		getController: function (name) {
+			var controllers = this.get ("_controllers");
+
+			return controllers[name];
+		},
+
+		//-------------------------------------------------------------------------
+		/**
+		 * Description
+		 * @name Controller#addModel
+		 * @function
+		 * @param {String} name Description
+		 * @param {Model} model Description
+		 */
+		addModel: function (name, model) {
+			var models = this.get ("_models");
+
+			models[name] = model;
+		},
+
+		//-------------------------------------------------------------------------
+		/**
+		 * Description
+		 * @name Controller#getModel
+		 * @function
+		 * @param {String} name Description
+		 * @return Description
+		 * @type Controller
+		 */
+		getModel: function (name) {
+			var models = this.get ("_models");
+
+			return models[name];
+		},
+
+		//-------------------------------------------------------------------------
+		/**
+		 * Description
 		 * @name Controller#getListener
 		 * @function
 		 * @param {String} action_name Description

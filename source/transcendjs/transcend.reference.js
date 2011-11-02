@@ -15,52 +15,51 @@ Core.register ("Reference", (function () {
 	var Reference = /** @lends Reference.prototype */ {
 		/**
 		 * @class Reference instances hold references to other objects or object
-		 * 	members.  These are useful when returning objects when the object has not 
-		 * 	yet been loaded or for passing arguments to functions when the value of
-		 * 	the argument won't be known until the time of the call.  For instance, a
-		 * 	Controller action may be requested but not called until some time later.
-		 * 	Passing a reference to a value rather than the value itself will provide
-		 * 	the call with the latest value.  These are especially useful for batch
-		 * 	operations to Controllers, allowing a Controller to be pre-programmed but
-		 * 	always have up-to-date arguments.  Note: Controllers recognize these and
-		 * 	act accordingly when they are passed.<br /><br />
+		 * members.  These are useful when returning objects when the object has not 
+		 * yet been loaded or for passing arguments to functions when the value of
+		 * the argument won't be known until the time of the call.  For instance, a
+		 * Controller action may be requested but not called until some time later.
+		 * Passing a reference to a value rather than the value itself will provide
+		 * the call with the latest value.  These are especially useful for batch
+		 * operations to Controllers, allowing a Controller to be pre-programmed but
+		 * always have up-to-date arguments.  Note: Controllers recognize these and
+		 * act accordingly when they are passed.<br /><br />
 		 * 
-		 * 	When referencing the member of an object and that member is a function,
-		 * 	any extra arguments passed to the constructor will be passed to that
-		 * 	function and it's return value is passed as the value.  If the member
-		 * 	function is one that supports References, these arguments may too be
-		 * 	Reference instances, allowing values to be referenced recursively.<br /><br />
+		 * When referencing the member of an object and that member is a function,
+		 * any extra arguments passed to the constructor will be passed to that
+		 * function and it's return value is passed as the value.  If the member
+		 * function is one that supports References, these arguments may too be
+		 * Reference instances, allowing values to be referenced recursively.<br /><br />
 		 * 
-		 * 	<pre>
-		 * 	ref = new Reference (object);
-		 * 	value = ref.getValue ();		//returns object
+		 * <pre>
+		 * ref = new Reference (object);
+		 * value = ref.getValue ();		//returns object
 		 * 
-		 * 	ref = new Reference (object, member);
-		 * 	value = ref.getValue ();		//returns object[member]
+		 * ref = new Reference (object, member);
+		 * value = ref.getValue ();		//returns object[member]
 		 * 
-		 * 	ref = new Reference (object, method, arg1, arg2);
-		 * 	value = ref.getValue ();		//returns object.method (arg1, arg2)
-		 * 	</pre><br />
+		 * ref = new Reference (object, method, arg1, arg2);
+		 * value = ref.getValue ();		//returns object.method (arg1, arg2)
+		 * </pre><br />
 		 * 
-		 * 	The variable <i>ref</i> declares where or how we get a value.  This may be 
-		 * 	passed to another function later where the getValue() method may be called 
-		 * 	and the value can be captured.  The first example shows a reference to an
-		 * 	object and is mainly for situations where a loader function must
-		 * 	return an object even though the "real" object is not yet loaded.<br /><br />
+		 * The variable <i>ref</i> declares where or how we get a value.  This may be 
+		 * passed to another function later where the getValue() method may be called 
+		 * and the value can be captured.  The first example shows a reference to an
+		 * object and is mainly for situations where a loader function must
+		 * return an object even though the "real" object is not yet loaded.<br /><br />
 		 * 
-		 * 	References passed to other References as arguments can be immediately 
-		 * 	recursed (early binding) or passed as-is to the object method (late 
-		 * 	binding).  The latter case may be preferable if the object method supports
-		 * 	referencing or if we simply want to pass around a Reference instance.  By
-		 * 	default, References bind early, however, this may be changed by setting the
-		 * 	bind_early property to false.  This can also be done in a chain call by
-		 * 	using the bindLate() method, as follows:<br /><br />
+		 * References passed to other References as arguments can be immediately 
+		 * recursed (early binding) or passed as-is to the object method (late 
+		 * binding).  The latter case may be preferable if the object method supports
+		 * referencing or if we simply want to pass around a Reference instance
+		 * untouched.  By default, References bind early, however, this may be 
+		 * changed by setting the bind_early property to false.  This can also 
+		 * be done in a chain call by using the bindLate() method, as 
+		 * follows:<br /><br />
 		 * 
-		 * 	<pre>
-		 * 	ref = (new Reference (object, method, arg1, arg2)).bindLate ();
-		 * 	value = ref.getValue ();		//If passed as an argument to another
-		 *                                  //reference, pass instance as-is
-		 * 	</pre><br />
+		 * <pre>
+		 * ref = (new Reference (object, method, arg1, arg2)).bindLate ();
+		 * </pre><br />
 		 * @constructs
 		 * @param {object} object Object being referenced.  May be another 
 		 * 	Reference.
