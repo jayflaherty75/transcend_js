@@ -32,13 +32,13 @@ Core.register ("Reference", (function () {
 		 * Reference instances, allowing values to be referenced recursively.<br />
 		 * 
 		 * <pre>
-		 * ref = new Reference (object);
-		 * value = ref.getValue ();		//returns object
-		 * 
-		 * ref = new Reference (object, member);
-		 * value = ref.getValue ();		//returns object[member]
-		 * 
-		 * ref = new Reference (object, method, arg1, arg2);
+		 * ref = new Reference (object);<br/>
+		 * value = ref.getValue ();		//returns object<br/>
+		 * <br/>
+		 * ref = new Reference (object, member);<br/>
+		 * value = ref.getValue ();		//returns object[member]<br/>
+		 * <br/>
+		 * ref = new Reference (object, method, arg1, arg2);<br/>
 		 * value = ref.getValue ();		//returns object.method (arg1, arg2)
 		 * </pre>
 		 * 

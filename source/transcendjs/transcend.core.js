@@ -1,3 +1,4 @@
+// NOT FOR PRODUCTION USE!
 /*!
  * TranscendJS JavaScript Application Framework v1.0.0
  * http://www.jasonkflaherty.com/
@@ -59,27 +60,27 @@
  	 * <i>oninit_override()</i> method which will override all other <i>oninit()</i> 
  	 * declarations but keep the original <i>initialize()</i> constructor.<br/>
  	 * <pre>
- 	 * Core.extend ("ButtonControl", "UIControlAbstract", {
- 	 * 	oninit: function () {
- 	 * 		//...
- 	 * 	},
- 	 * 
- 	 * 	onpostrender: function (parent, elements) {
- 	 * 		//...
- 	 * 	}
- 	 * },
- 	 * {
- 	 * 	test: function () {
- 	 * 		//...
- 	 * 		return true;
- 	 * 	}
+ 	 * Core.extend ("ButtonControl", "UIControlAbstract", {<br/>
+ 	 * 	oninit: function () {<br/>
+ 	 * 		//...<br/>
+ 	 * 	},<br/>
+ 	 * <br/>
+ 	 * 	onpostrender: function (parent, elements) {<br/>
+ 	 * 		//...<br/>
+ 	 * 	}<br/>
+ 	 * },<br/>
+ 	 * {<br/>
+ 	 * 	test: function () {<br/>
+ 	 * 		//...<br/>
+ 	 * 		return true;<br/>
+ 	 * 	}<br/>
  	 * });
  	 * </pre>
  	 * <b>Creating Instances, Getting Singletons and Globalizing</b><br/>
  	 * <br/>
  	 * A new object may be instantiated using the <i>getInstance()</i> method.  This 
  	 * method will also return the single instance of any singletons that have 
- 	 * been declared.  In the next section, we will talk about the <i>_()</i> 
+ 	 * been registered.  In the next section, we will talk about the <i>_()</i> 
  	 * (underscore) method which is an alias for getInstance and how this can 
  	 * be used to organize code.  You may also access the class directly using 
  	 * <i>getClass()</i>.<br/>
@@ -130,10 +131,10 @@
  	 * access to a specific library and call it's methods directory, which is 
  	 * the case in the Type library for checking the data types of variables:<br/>
  	 * <pre>
- 	 * var _type = Core._("Helpers.Type");
- 	 * //...
- 	 * if (_type.isDefined (foo)) { ... };
- 	 * if (_type.isFunction (foo.someMethod) { ... };
+ 	 * var _type = Core._("Helpers.Type");<br/>
+ 	 * //...<br/>
+ 	 * if (_type.isDefined (foo)) { ... };<br/>
+ 	 * if (_type.isFunction (foo.someMethod) { ... };<br/>
  	 * if (_type._(foo) == "String") { ... };
  	 * </pre>
  	 * TranscendJS uses this approach for storing helper libraries, Exception 
@@ -196,19 +197,19 @@
 		 * @return Class constructor of the newly registered class
 		 * @type object
 		 * @example
-		 * Core.register ("MyClass", {
-	 	 * 	initialize: function () {
-	 	 * 		//...
-	 	 * 	},
-	 	 * 
-	 	 * 	method: function (param1, param2) {
-	 	 * 		//...
-	 	 * 	}
-	 	 * },
-	 	 * {
-	 	 * 	staticMethod: function () {
-	 	 * 		//...
-	 	 * 	}
+		 * Core.register ("MyClass", {<br/>
+	 	 * 	initialize: function () {<br/>
+	 	 * 		//...<br/>
+	 	 * 	},<br/>
+	 	 * <br/>
+	 	 * 	method: function (param1, param2) {<br/>
+	 	 * 		//...<br/>
+	 	 * 	}<br/>
+	 	 * },<br/>
+	 	 * {<br/>
+	 	 * 	staticMethod: function () {<br/>
+	 	 * 		//...<br/>
+	 	 * 	}<br/>
 	 	 * });
 		 */
 		register: function (name, methods, statics) {
@@ -240,20 +241,20 @@
 		 * @return Class constructor of the newly registered class
 		 * @type object
 		 * @example
-		 * Core.extend ("ButtonControl", "UIControlAbstract", {
-	 	 * 	oninit: function () {
-	 	 * 		//...
-	 	 * 	},
-	 	 * 
-	 	 * 	onpostrender: function (parent, elements) {
-	 	 * 		//...
-	 	 * 	}
-	 	 * },
-	 	 * {
-	 	 * 	test: function () {
-	 	 * 		//...
-	 	 * 		return true;
-	 	 * 	}
+		 * Core.extend ("ButtonControl", "UIControlAbstract", {<br/>
+	 	 * 	oninit: function () {<br/>
+	 	 * 		//...<br/>
+	 	 * 	},<br/>
+	 	 * <br/>
+	 	 * 	onpostrender: function (parent, elements) {<br/>
+	 	 * 		//...<br/>
+	 	 * 	}<br/>
+	 	 * },<br/>
+	 	 * {<br/>
+	 	 * 	test: function () {<br/>
+	 	 * 		//...<br/>
+	 	 * 		return true;<br/>
+	 	 * 	}<br/>
 	 	 * });
 		 */
 		extend: function (name, parent, methods, statics) {
@@ -368,14 +369,14 @@
 		 * @param {string} name Event identifier
 		 * @param {function} listener Listener function
 		 * @example
-		 * var foo = new Image ("images/foo.png");
-		 * 
-		 * Core.listen (foo, "click", function () {
-		 * 	alert ("Handler #1");
-		 * });
-		 * 
-		 * Core.listen (foo, "click", function () {
-		 * 	alert ("Handler #2");
+		 * var foo = new Image ("images/foo.png");<br/>
+		 * <br/>
+		 * Core.listen (foo, "click", function () {<br/>
+		 * 	alert ("Handler #1");<br/>
+		 * });<br/>
+		 * <br/>
+		 * Core.listen (foo, "click", function () {<br/>
+		 * 	alert ("Handler #2");<br/>
 		 * });
 		 */
 		listen: function (object, name, listener) {
@@ -405,8 +406,8 @@
 		 * @param {boolean} overwrite Determines whether global values should
 		 * 		be overwritten.  Default is <i>false</i>
 		 * @example
-		 * Core.globalize ();
-		 * var ref1 = Core._("Reference");
+		 * Core.globalize ();<br/>
+		 * var ref1 = Core._("Reference");<br/>
 		 * var ref2 = new Reference ();
 		 */
 		globalize: function (name, overwrite) {
@@ -446,7 +447,7 @@
 		 * @return Class constructor
 		 * @type function
 		 * @example
-		 * var eventcast = Core.getClass ("Eventcast");
+		 * var eventcast = Core.getClass ("Eventcast");<br/>
 		 * var target = eventcast.getTarget (event);	//call static method of class
 		 */
 		getClass: function (name) {
@@ -564,10 +565,10 @@
 		 * @return New instance
 		 * @type object
 		 * @example
-		 * var foo = Core.getInstance("Helpers").getValue("QueryString").get("foo");
-		 * 
-	 	 * var foo = Core._("Helpers")._("QueryString")._("foo");
-	 	 * 
+		 * var foo = Core.getInstance("Helpers").getValue("QueryString").get("foo");<br/>
+		 * <br/>
+	 	 * var foo = Core._("Helpers")._("QueryString")._("foo");<br/>
+	 	 * <br/>
 	 	 * var foo = Core._("Helpers.QueryString.foo");	//Chain call
 		 */
 		_: function () {
@@ -626,10 +627,53 @@
 //-----------------------------------------------------------------------------
 Core.register ("CoreBranch", /** @lends CoreBranch.prototype */ {
 	/**
-	 * @class Provides method of adding organized, "branched" systems to the
-	 * 	Core framework.  These may be simply accessed using the Core default
-	 * 	method (_), using period-delimited names to traverse the hierarchy.
-	 * <br/><br/>
+	 * @class Provides method of adding organized, "branched" systems to the 
+	 * Core framework.  These may be simply accessed using the Core default 
+	 * method (_), using period-delimited names to traverse the hierarchy.<br/>
+	 * <br/>
+	 * The CoreBranch class provides the basic building block for organizing 
+	 * code and data into hierarchical structures under the TranscendJS Core.  
+	 * These are currently being used within the framework for storing 
+	 * configuration data, "helper" libraries, exception classes and template 
+	 * data.  You may even create your own tree structures by simply 
+	 * registering a CoreBranch instance as a singleton (see {@link Core}).  
+	 * If you would like to provide special functionality, you can extend 
+	 * CoreBranch and use an instance of your own custom class instead.  See 
+	 * the source for {@link ConfigBranch} and {@link ExceptionBranch} for 
+	 * examples.<br/>
+	 * <br/>
+	 * <b>To build a branch off of the Core:</b><br/>
+	 * <pre>
+	 * Core.singleton ("MyBranch", Core._("CoreBranch"));
+	 * </pre>
+	 * <b>To register entries:</b><br/>
+	 * <pre>
+	 * Core._("MyBranch").register ("foo", some_function);<br/>
+	 * Core._("MyBranch").register ("Baz");<br/>
+	 * Core._("MyBranch.Baz").register ("bar", (function () {<br/>
+	 * 	var Library = {<br/>
+	 * 		method1: function (param1, param2) {<br/>
+	 * 			//...<br/>
+	 * 		},<br/>
+	 * 		method2: function (param1, param2) {<br/>
+	 * 			//...<br/>
+	 * 		}<br/>
+	 * 	}<br/>
+	 * <br/>
+	 * 	Library._ = Library.method1;	//method1 becomes the default method;<br/>
+	 * <br/>
+	 * 	return Library;<br/>
+	 * }) ());
+	 * </pre>
+	 * <b>Traversing the hierarchy:</b><br/>
+	 * <pre>
+	 * var result1 = Core._("MyBranch.foo", param);<br/>
+	 * //The following calls method1, the default method<br/>
+	 * var result2 = Core._("MyBranch.Baz.bar", param1, param2);
+	 * </pre>
+	 * see "The Default Method and Using Core Hierarchies" in the {@link Core} 
+	 * documentation for more information.<br/>
+	 * <br/>
  	 * If you would like to continue with the tutorial, continue to {@link ConfigBranch}.
 	 * @constructs
 	 */
@@ -644,6 +688,9 @@ Core.register ("CoreBranch", /** @lends CoreBranch.prototype */ {
 		 * @function
 		 * @param {String} name Name of value or branch to be added.
 		 * @param {Any} value Value stored under name
+		 * @example
+		 * Core._("MyBranch").register ("Baz");<br/>
+		 * Core._("MyBranch.Baz").register ("bar", some_function);
 		 */
 		this.register = function (name, value) {
 			if (typeof (_values[name]) == "undefined") {
@@ -663,11 +710,15 @@ Core.register ("CoreBranch", /** @lends CoreBranch.prototype */ {
 		//--------------------------------------------------------------------
 		/**
 		 * Retrieves the value or branch at the given name under the current 
-		 * branch.
+		 * branch.  When accessed from <i>Core._()</i>, this function is
+		 * implicitly called when using preiod-delimited names.
 		 * @name CoreBranch#getValue
 		 * @function
 		 * @param {String} name Name of value or branch to be retrieved
 		 * @param {Any} value If given, sets the value
+		 * @example
+		 * var value = Core._("MyBranch.foo");<br/>
+		 * var result = Core._("MyBranch.Baz.bar", param1, param2);
 		 */
 		this.getValue = function (name) {
 			if (typeof (name) != "undefined")
